@@ -4,13 +4,27 @@
  */
 package com.cwoodson.pigaddons.rutils;
 
+import java.io.InputStream;
+import java.util.List;
+import org.nuiton.j2r.RException;
+
 /**
  *
  * @author connor-woodson
  */
-public abstract class RConnector
+public interface RConnector
 {
-    public abstract void connect();
+    boolean init();
     
-    public abstract void shutdown();
+    void terminate() throws RException;
+    
+    void execfile(InputStream scriptStream, String path) throws RException;
+    
+    List<String> lsVariables();
+    
+    List<String> lsFunctions();
+    
+    Object eval(String expr) throws RException;
+    
+    void voidEval(String expr) throws RException;
 }
