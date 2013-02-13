@@ -10,8 +10,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.nuiton.j2r.REngine;
 import org.nuiton.j2r.RException;
 import org.nuiton.j2r.jni.RJniEngine;
+import org.nuiton.j2r.types.RList;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,16 +37,69 @@ public class RJriConnector extends RJniEngine implements RConnector
     };
     private static final boolean OVERWRITE = false;
     
-    static
+    @Override
+    public boolean init()
     {
         try {
             System.loadLibrary("jri");
+            log.info("JRI successfully loaded");
         } catch(UnsatisfiedLinkError ule) {
             try {
+                log.debug("Failed to load JRI on first try. Extracting binaries.");
                 LibraryLoader.extractNativeLibraries(LIB_BIN, LIB_PATH, OVERWRITE, LIBS);
+                log.debug("Binaries extracted. Trying to load JRI");
                 System.loadLibrary("jri");
-            } catch(Throwable t) {}
+                log.info("JRI successfully loaded (second try)");
+            } catch(Throwable t) {
+                log.error("Unable to load JRI. Exception follows.", t);
+            }
         }
+        return super.init();
+    }
+    
+    @Override
+    public Object eval(String code) throws RException
+    {
+        Object result = super.eval(code);
+        
+        // Turn RVector into RList
+        if(result instanceof RVector)
+        {
+            return vectorToList((RVector) result);
+        } else {
+            return result;
+        }
+    }
+    
+    protected Object convert(REXP val)
+    {
+        Object result = super.convertResult(val);
+        
+        // Turn RVector into RList
+        if(result instanceof RVector)
+        {
+            return vectorToList((RVector) result);
+        } else {
+            return result;
+        }
+    }
+    
+    private RList vectorToList(RVector vec)
+    {
+        List<String> names = vec.getNames();
+        List<Object> data = new ArrayList<Object>(names.size());
+        for(String name : names)
+        {
+            REXP rVal = vec.at(name);
+            data.add(convert(rVal));
+        }
+        RList list = null;
+        try {
+            list = new RList(names.toArray(new String[0]), data, (REngine) this, "");
+        } catch(RException re) {
+            log.warn("Try-Catch in RJriConnector.vectorToList unexpectedly reached", re);
+        }
+        return list;
     }
 
     public void execfile(InputStream scriptStream, String path) throws RException
@@ -118,5 +175,16 @@ public class RJriConnector extends RJniEngine implements RConnector
             log.error("Error in lsFunctions", re);
         }
         return result;
+    }
+    
+    public static RJriConnector create()
+    {
+        RJriConnector rjc = new RJriConnector();
+        if(rjc.init())
+        {
+            return rjc;
+        } else {
+            return null;
+        }
     }
 }

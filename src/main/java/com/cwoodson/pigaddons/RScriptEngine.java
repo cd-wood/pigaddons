@@ -26,7 +26,7 @@ public class RScriptEngine extends ScriptEngine
     private static class Interpreter
     {
         static final RConnector rEngine;
-        static final Set<String> internalFunctions = new HashSet<String>();
+        static final Set<String> internalNames = new HashSet<String>();
         static
         {
             rEngine = new RJriConnector();
@@ -69,7 +69,7 @@ public class RScriptEngine extends ScriptEngine
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
         for(String name : Interpreter.rEngine.lsFunctions())
         {
-            if(!Interpreter.internalFunctions.contains(name))
+            if(!Interpreter.internalNames.contains(name))
             {
                 FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "(" + name + ")");
                 context.registerFunction(namespace + name, funcspec);
@@ -117,13 +117,21 @@ public class RScriptEngine extends ScriptEngine
         List<String> variables = rEngine.lsVariables();
         for(String v : variables)
         {
-            try {
-                result.put(v, rEngine.eval(v));
-            } catch(RException re) {
-                throw new IOException("Error evaluating variable " + v, re);
+            if(!Interpreter.internalNames.contains(v))
+            {
+                try {
+                    result.put(v, rEngine.eval(v));
+                } catch(RException re) {
+                    throw new IOException("Error evaluating variable " + v, re);
+                }
             }
         }
         return result;
+    }
+    
+    public static RConnector getEngine()
+    {
+        return Interpreter.rEngine;
     }
     
     private static class RShutdown extends Thread

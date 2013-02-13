@@ -6,6 +6,7 @@ package com.cwoodson.pigaddons;
 
 import com.cwoodson.pigaddons.rutils.RJriConnector;
 import java.io.*;
+import java.util.Arrays;
 
 /**
  *
@@ -26,8 +27,9 @@ public class MainClass {
             String str = "obj <- .jnew(\"com.cwoodson.pigaddons.TestClass\")\n.jcall(obj, \"V\", \"DoSomething\")";
             InputStream is = new ByteArrayInputStream(str.getBytes());
             rc.execfile(is, ".");
-            rc.voidEval("a <- ls");
-            rc.voidEval("class(a) <- 'string'");
+            Object a = rc.eval("a <- function(x) {}");
+            int i = 1;
+            //System.out.println(Arrays.asList(rc.ls()).toString());
         } catch(Exception e) {
             System.err.println(e);
             e.printStackTrace();
