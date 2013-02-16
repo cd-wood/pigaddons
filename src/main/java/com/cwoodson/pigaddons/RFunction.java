@@ -6,6 +6,7 @@ package com.cwoodson.pigaddons;
 
 import com.cwoodson.pigaddons.rutils.RConnector;
 import com.cwoodson.pigaddons.rutils.RUtils;
+import com.cwoodson.pigaddons.rutils.RUtils.REXPStr;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -17,6 +18,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.util.UDFContext;
 import org.apache.pig.impl.util.Utils;
 import org.apache.pig.parser.ParserException;
+import org.nuiton.j2r.REngine;
 import org.nuiton.j2r.RException;
 import org.nuiton.j2r.types.REXP;
 import org.slf4j.Logger;
@@ -66,11 +68,11 @@ public class RFunction extends EvalFunc<Object> {
         }
         Object functionResult = null;
         try {
-            List<REXP> params = RUtils.pigTupleToRList(tuple, inputSchema, 0);
+            List<REXPStr> params = RUtils.pigTupleToR(tuple, inputSchema, 0, (REngine) rEngine);
             String paramString = "";
             for (int i = 0; i < params.size(); i++) {
 
-                String rStr = params.get(i).toRString();
+                String rStr = params.get(i).rexp.toRString();
                 if (rStr.startsWith("<-")) {
                     rStr = rStr.substring(2);
                 }
@@ -82,7 +84,7 @@ public class RFunction extends EvalFunc<Object> {
             throw new IOException("R Function Execution failed", ex);
         }
         
-        Tuple evalTuple = RUtils.rObjectToPigTuple(functionResult, outputSchema, 0);
+        Tuple evalTuple = null;//RUtils.rToPigTuple(functionResult, outputSchema, 0);
         Object eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
 
         return eval;
