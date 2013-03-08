@@ -43,16 +43,8 @@ public class RJriConnector extends RJniEngine implements RConnector
         try {
             System.loadLibrary("jri");
             log.info("JRI successfully loaded");
-        } catch(UnsatisfiedLinkError ule) {
-            try {
-                log.debug("Failed to load JRI on first try. Extracting binaries.");
-                LibraryLoader.extractNativeLibraries(LIB_BIN, LIB_PATH, OVERWRITE, LIBS);
-                log.debug("Binaries extracted. Trying to load JRI");
-                System.loadLibrary("jri");
-                log.info("JRI successfully loaded (second try)");
-            } catch(Throwable t) {
-                log.error("Unable to load JRI. Exception follows.", t);
-            }
+        } catch(Throwable t) {
+            log.error("Unable to load JRI. Exception follows.", t);
         }
         return super.init();
     }

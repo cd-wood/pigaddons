@@ -3,6 +3,7 @@ package com.cwoodson.pigaddons.rutils;
 import com.cwoodson.pigaddons.RScriptEngine;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import org.apache.commons.io.*;
 
 /**
@@ -22,22 +23,24 @@ public class LibraryLoader
         }
     }
     
-    public static void forceSetJavaLibraryPath(String path) throws NoSuchFieldException, IllegalAccessException
+    public static void addJavaLibraryPath(String path) throws NoSuchFieldException, IllegalAccessException
     {
-        String oldPath = System.getProperty("java.library.path");
-        String newPath;
-        if(oldPath == null || oldPath.isEmpty())
+        final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+        usrPathsField.setAccessible(true);
+        
+        final String[] paths = (String[])usrPathsField.get(null);
+        
+        for(String p : paths)
         {
-            newPath = path;
-        } else
-        {
-            newPath = oldPath + System.getProperty("path.separator") + path;
+            if(p.equals(path))
+            {
+                return;
+            }
         }
-        System.setProperty("java.library.path", newPath);
- 
-        Field fieldSysPath = ClassLoader.class.getDeclaredField( "sys_paths" );
-        fieldSysPath.setAccessible( true );
-        fieldSysPath.set( null, null );
+        
+        final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+        newPaths[paths.length] = path;
+        usrPathsField.set(null, newPaths);
     }
     
     private static void extractNativeLibrary(String from, String to, boolean overwrite) throws IOException
