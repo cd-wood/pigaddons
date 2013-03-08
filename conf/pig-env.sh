@@ -15,10 +15,10 @@
 
 export JAVA_HOME=${JAVA_HOME}
 
-$OS="$(uname)"
-$ARCH="$(arch)"
-$R_VERSION="2.15.3"
+OS="$(uname)"
+ARCH="$(arch)"
+R_VERSION="2.15.3"
 
-$BINARY_PATH="$(pwd)/../lib-bin/R-$R_VERSION/$OS/$ARCH/*"
+BINARY_PATH="$(pwd)/../lib-bin/R-$R_VERSION/$OS/$ARCH/*"
 
-export PIG_OPTS="$PIG_OPTS -Djava.library.path=\"$BINARY_PATH\" -DLD_LIBRARY_PATH=\"$BINARY_PATH\""
+export PIG_OPTS="$PIG_OPTS -Djava.library.path=$BINARY_PATH -DLD_LIBRARY_PATH=$BINARY_PATH"
