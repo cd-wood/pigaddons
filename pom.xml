@@ -118,7 +118,7 @@
       <repository>
           <id>local-project-libraries</id>
           <name>Local project libraries</name>
-          <url>file://${project.basedir}\\lib</url>
+          <url>file://${project.basedir}/lib</url>
           <layout>default</layout>
       </repository>
  </repositories>
