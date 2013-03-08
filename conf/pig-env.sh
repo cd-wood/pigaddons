@@ -19,6 +19,7 @@ OS="$(uname)"
 ARCH="$(arch)"
 R_VERSION="2.15.3"
 
-BINARY_PATH="$(pwd)/../lib-bin/R-$R_VERSION/$OS/$ARCH/*"
+BINARY_PATH="/home/cwoodson/pig-stuff/pigaddons/lib-bin/R-${R_VERSION}/${OS}/${ARCH}"
 
-export PIG_OPTS="$PIG_OPTS -Djava.library.path=$BINARY_PATH -DLD_LIBRARY_PATH=$BINARY_PATH"
+export R_HOME="${BINNARY_PATH}"
+export PIG_OPTS="${PIG_OPTS} -Djava.library.path=${BINARY_PATH} -DLD_LIBRARY_PATH=${BINARY_PATH} -DLD_LIBRARY_PATH=${BINARY_PATH} -Dpig.additional.jars=/home/cwoodson/pig-stuff/pig-0.9.2/contrib/piggybank/java/piggybank.jar:/home/cwoodson/pig-stuff/pigaddons/*.jar"
