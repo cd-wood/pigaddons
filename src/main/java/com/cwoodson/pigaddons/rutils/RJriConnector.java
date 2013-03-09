@@ -64,21 +64,19 @@ public class RJriConnector implements RConnector
 
                 //jriLoaded is false is rJava did not find jri library
                 if (!Rengine.jriLoaded) {
-                    if (log.isErrorEnabled()) {
-                        log.error(
+                    log.error(
                             "Cannot find jri library, make sure it is correctly installed");
-                    }
                     return false;
                 }
 
                 engine = new Rengine(args, false, null);
                 
                 if (!engine.waitForR()) {
-                    if (log.isErrorEnabled()) {
-                        log.error("Cannot load the R engine");
-                    }
+                    log.error("Cannot load the R engine");
                     return false;
                 }
+                
+                log.info("Rengine Started");
             } catch (Exception eee) {
                 log.error("An error occured during R/JNI initialization.",
                     eee);
@@ -100,9 +98,7 @@ public class RJriConnector implements RConnector
             log.debug("Null returned");
             return null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Converting : " + rexp.toString());
-        }
+        log.debug("Converting : " + rexp.toString());
         int type = rexp.getType();
         Object result = null;
         switch (type) {
@@ -242,10 +238,8 @@ public class RJriConnector implements RConnector
                             data, (REngine) this, "");
                     } catch (RException re) {
                         //don't propagate the error as it is normal. Log it for debug.
-                        if (log.isDebugEnabled()) {
-                            log.debug(
+                        log.debug(
                                 "Converting REXP to RList. Creating list without variable name");
-                        }
                     }
                     result = temp;
                 } else {
@@ -291,9 +285,7 @@ public class RJriConnector implements RConnector
 
         //encapsulate the R expression in a try method/object to get the R error
         //message if thrown
-        if (log.isDebugEnabled()) {
-            log.debug(String.format(RInstructions.RTRY, expr));
-        }
+        log.debug(String.format(RInstructions.RTRY, expr));
         REXP r = engine.eval(String.format(RInstructions.RTRY, expr));
         if ((null != r) && (null != r.getAttribute(RInstructions.ATTRIBUTE_CLASS))) {
             //if the "class" attribute of the R expression is "try-error"
@@ -309,9 +301,8 @@ public class RJriConnector implements RConnector
     public Object eval(String expr) throws RException
     {
         REXP result = null;
-        if (log.isDebugEnabled()) {
-            log.debug(String.format(RInstructions.RTRY, expr));
-        }
+        log.debug(String.format(RInstructions.RTRY, expr));
+        
         //encapsulate the R expression in a try method/object to get the R error
         //message if thrown
         result = engine.eval(String.format(RInstructions.RTRY, expr));
