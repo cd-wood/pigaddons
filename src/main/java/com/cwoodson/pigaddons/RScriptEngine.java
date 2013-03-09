@@ -33,7 +33,7 @@ public class RScriptEngine extends ScriptEngine
         static final Set<String> internalNames = new HashSet<String>();
         static
         {
-            log.debug("Creating RJriConnector");
+            System.out.println("Creating RJriConnector");
             rEngine = RJriConnector.create();
             log.debug("RJriConnector Created");
             try {
