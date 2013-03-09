@@ -45,15 +45,9 @@ public class RJriConnector implements RConnector
         {
             try {
                 System.loadLibrary("jri");
-                log.info("JRI successfully loaded as 'jri'");
-            } catch(UnsatisfiedLinkError ule) {
-                try {
-                    log.debug("Failed to load JRI as 'jri'");
-                    System.loadLibrary("libjri");
-                    log.info("JRI successfully loaded as 'libjri'");
-                } catch(Throwable t) {
-                    log.error("Unable to load JRI. Exception follows.", t);
-                }
+                log.info("JRI successfully loaded");
+            } catch(Throwable t) {
+                log.error("Unable to load JRI. Exception follows.", t);
             }
             
             try {
