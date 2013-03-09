@@ -38,7 +38,7 @@ public class RScriptEngine extends ScriptEngine
             if(rEngine == null)
             {
                 System.err.println("REngine wasn't created");
-                System.exit(1);
+                throw new RuntimeException("Quitting");
             }
             System.out.println("RJriConnector Created");
             try {
@@ -156,6 +156,7 @@ public class RScriptEngine extends ScriptEngine
         public void run()
         {
             try {
+                System.out.println("Shutting Down R");
                 Interpreter.rEngine.terminate();
             } catch(Exception e) {
                 
