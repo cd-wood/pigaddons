@@ -51,7 +51,7 @@ public class RJriConnector implements RConnector
             }
             
             try {
-                String[] args = {"--no-save", "--no-environ"};
+                String[] args = {"--no-save", "--vanilla"};
 
                 //Set the property so that rJava does not make a System.exit(1)
                 //System.setProperty("jri.ignore.ule", "yes");
@@ -71,7 +71,7 @@ public class RJriConnector implements RConnector
                 }
                 
                 log.info("Rengine Started");
-            } catch (Exception eee) {
+            } catch (Throwable eee) {
                 log.error("An error occured during R/JNI initialization.",
                     eee);
                 return false;
@@ -336,10 +336,12 @@ public class RJriConnector implements RConnector
         
         try {
             String line = null;
+            String fullLine = "";
             while((line = in.readLine()) != null)
             {
-                voidEval(line);
+                fullLine = line + '\n';
             }
+            voidEval(fullLine);
         } catch(IOException ioe) {
             log.error("Error while reading input stream", ioe);
             throw new RException("Error while reading input stream", ioe);

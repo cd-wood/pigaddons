@@ -8,6 +8,7 @@ import com.cwoodson.pigaddons.rutils.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Permission;
 import java.util.*;
 import org.apache.pig.FuncSpec;
 import org.apache.pig.PigServer;
@@ -33,26 +34,21 @@ public class RScriptEngine extends ScriptEngine
         static final Set<String> internalNames = new HashSet<String>();
         static
         {
-            System.out.println("Creating RJriConnector");
+            Runtime.getRuntime().addShutdownHook(new RShutdown());
             rEngine = RJriConnector.create();
             if(rEngine == null)
             {
-                System.err.println("REngine wasn't created");
-                throw new RuntimeException("Quitting");
+                log.error("Rengine failed to be created. Exiting program.");
+                System.exit(1);
             }
-            System.out.println("RJriConnector Created");
             try {
-                System.out.println("Sending init commands");
-                rEngine.init();
                 rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
                 rEngine.voidEval("library(rJava)");
                 rEngine.voidEval(".jinit()");
-                System.out.println("R initialized");
             } catch(RException re) {
                 log.error("RException thrown", re);
                 throw new RuntimeException("Unable to initialize R", re);
             }
-            Runtime.getRuntime().addShutdownHook(new RShutdown());
         }
         
         static void init(String path, PigContext pigContext) throws IOException
@@ -81,7 +77,6 @@ public class RScriptEngine extends ScriptEngine
     public void registerFunctions(String path, String namespace, PigContext context) throws IOException {
         Interpreter.init(path, context);
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
-        log.debug("Registering function " + namespace);
         for(String name : Interpreter.rEngine.lsFunctions())
         {
             if(!Interpreter.internalNames.contains(name))
@@ -156,12 +151,13 @@ public class RScriptEngine extends ScriptEngine
         public void run()
         {
             try {
-                System.out.println("Shutting Down R");
-                Interpreter.rEngine.terminate();
+                if(Interpreter.rEngine != null)
+                {
+                    Interpreter.rEngine.terminate();
+                }
             } catch(Exception e) {
                 
             }
         }
-        
     }
 }
