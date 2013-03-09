@@ -339,7 +339,7 @@ public class RJriConnector implements RConnector
             String fullLine = "";
             while((line = in.readLine()) != null)
             {
-                fullLine = line + '\n';
+                fullLine += line + '\n';
             }
             voidEval(fullLine);
         } catch(IOException ioe) {
