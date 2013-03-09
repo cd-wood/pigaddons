@@ -333,7 +333,7 @@ public class RJriConnector implements RConnector
     public void execfile(InputStream scriptStream, String path) throws RException
     {
         BufferedReader in = new BufferedReader(new InputStreamReader(scriptStream));
-        
+        log.debug("Executing R File: " + path);
         try {
             String line = null;
             String fullLine = "";
@@ -341,6 +341,7 @@ public class RJriConnector implements RConnector
             {
                 fullLine += line + '\n';
             }
+            log.debug("Executing code: " + fullLine);
             voidEval(fullLine);
         } catch(IOException ioe) {
             log.error("Error while reading input stream", ioe);
