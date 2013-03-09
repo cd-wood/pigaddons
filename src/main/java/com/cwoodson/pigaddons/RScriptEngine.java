@@ -35,13 +35,13 @@ public class RScriptEngine extends ScriptEngine
         static
         {
             Runtime.getRuntime().addShutdownHook(new RShutdown());
-            rEngine = RJriConnector.create();
-            if(rEngine == null)
-            {
-                log.error("Rengine failed to be created. Exiting program.");
-                System.exit(1);
-            }
             try {
+                rEngine = RJriConnector.create();
+                if(rEngine == null)
+                {
+                    log.error("Rengine failed to be created. Exiting program.");
+                    System.exit(1);
+                }
                 rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
                 rEngine.voidEval("library(rJava)");
                 rEngine.voidEval(".jinit()");
