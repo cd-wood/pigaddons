@@ -16,6 +16,8 @@ import org.apache.pig.impl.PigContext;
 import org.apache.pig.scripting.ScriptEngine;
 import org.apache.pig.tools.pigstats.PigStats;
 import org.nuiton.j2r.RException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -23,19 +25,26 @@ import org.nuiton.j2r.RException;
  */
 public class RScriptEngine extends ScriptEngine
 {
+    private static final Logger log = LoggerFactory.getLogger(RScriptEngine.class);
+    
     private static class Interpreter
     {
         static final RConnector rEngine;
         static final Set<String> internalNames = new HashSet<String>();
         static
         {
-            rEngine = new RJriConnector();
+            log.debug("Creating RJriConnector");
+            rEngine = RJriConnector.create();
+            log.debug("RJriConnector Created");
             try {
+                log.debug("Sending init commands");
                 rEngine.init();
                 rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
                 rEngine.voidEval("library(rJava)");
                 rEngine.voidEval(".jinit()");
+                log.debug("R initialized");
             } catch(RException re) {
+                log.error("RException thrown", re);
                 throw new RuntimeException("Unable to initialize R", re);
             }
             Runtime.getRuntime().addShutdownHook(new RShutdown());
@@ -67,6 +76,7 @@ public class RScriptEngine extends ScriptEngine
     public void registerFunctions(String path, String namespace, PigContext context) throws IOException {
         Interpreter.init(path, context);
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
+        log.debug("Registering function " + namespace);
         for(String name : Interpreter.rEngine.lsFunctions())
         {
             if(!Interpreter.internalNames.contains(name))
@@ -92,6 +102,7 @@ public class RScriptEngine extends ScriptEngine
         
         if(!f.canRead())
         {
+            log.error("Unable to open specified file");
             throw new IOException("Can't read file: " + scriptFile);
         }
         
@@ -122,6 +133,7 @@ public class RScriptEngine extends ScriptEngine
                 try {
                     result.put(v, rEngine.eval(v));
                 } catch(RException re) {
+                    log.error("Error evaluating variable " + v, re);
                     throw new IOException("Error evaluating variable " + v, re);
                 }
             }
