@@ -77,15 +77,18 @@ public class RScriptEngine extends ScriptEngine
     public void registerFunctions(String path, String namespace, PigContext context) throws IOException {
         Interpreter.init(path, context);
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
+        log.debug("Registering Functions in Namespace: " + namespace);
         for(String name : Interpreter.rEngine.lsFunctions())
         {
             if(!Interpreter.internalNames.contains(name))
             {
                 FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "(" + name + ")");
                 context.registerFunction(namespace + name, funcspec);
+                log.debug("Registered Function: " + name);
             }
         }
         context.addScriptFile(path);
+        log.debug("Functions Registered");
     }
 
     @Override
