@@ -57,7 +57,7 @@ public class RJriConnector implements RConnector
             }
             
             try {
-                String[] args = {"--no-save", "--no-environ"};
+                String[] args = {"--no-save", "--vanilla"};
 
                 //Set the property so that rJava does not make a System.exit(1)
                 //System.setProperty("jri.ignore.ule", "yes");
