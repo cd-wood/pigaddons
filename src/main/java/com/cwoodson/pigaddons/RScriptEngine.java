@@ -33,18 +33,23 @@ public class RScriptEngine extends ScriptEngine
         static final Set<String> internalNames = new HashSet<String>();
         static
         {
-            log.debug("Creating RJriConnector");
+            System.out.println("Creating RJriConnector");
             rEngine = RJriConnector.create();
-            log.debug("RJriConnector Created");
+            if(rEngine == null)
+            {
+                System.err.println("Unable to create REngine");
+                throw new RuntimeException("Quitting");
+            }
+            System.out.println("RJriConnector Created");
             try {
-                log.debug("Sending init commands");
+                System.out.println("Sending init commands");
                 rEngine.init();
                 rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
                 rEngine.voidEval("library(rJava)");
                 rEngine.voidEval(".jinit()");
-                log.debug("R initialized");
+                System.out.println("R initialized");
             } catch(RException re) {
-                log.error("RException thrown", re);
+                System.err.println("RException thrown: " + re.getMessage());
                 throw new RuntimeException("Unable to initialize R", re);
             }
             Runtime.getRuntime().addShutdownHook(new RShutdown());

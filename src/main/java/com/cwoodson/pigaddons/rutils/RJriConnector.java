@@ -45,26 +45,20 @@ public class RJriConnector implements RConnector
         {
             try {
                 System.loadLibrary("jri");
-                log.info("JRI successfully loaded as 'jri'");
-            } catch(UnsatisfiedLinkError ule) {
-                try {
-                    log.debug("Failed to load JRI as 'jri'");
-                    System.loadLibrary("libjri");
-                    log.info("JRI successfully loaded as 'libjri'");
-                } catch(Throwable t) {
-                    log.error("Unable to load JRI. Exception follows.", t);
-                }
+                System.out.println("JRI successfully loaded");
+            } catch(Throwable t) {
+                System.err.println("Unable to load JRI. Exception follows: " + t.getMessage());
             }
             
             try {
-                String[] args = {"--no-save", "--no-environ"};
+                String[] args = new String[] {"--vanilla", "--no-save"};
 
                 //Set the property so that rJava does not make a System.exit(1)
                 //System.setProperty("jri.ignore.ule", "yes");
 
                 //jriLoaded is false is rJava did not find jri library
                 if (!Rengine.jriLoaded) {
-                    log.error(
+                    System.err.println(
                             "Cannot find jri library, make sure it is correctly installed");
                     return false;
                 }
