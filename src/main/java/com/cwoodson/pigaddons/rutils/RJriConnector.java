@@ -359,7 +359,25 @@ public class RJriConnector implements RConnector
     
     public String[] ls() throws RException
     {
-        return (String[]) eval("ls()");
+        String[] ls;
+        Object lsO =  eval("ls()");
+        if(lsO == null)
+        {
+            ls = new String[0];
+        }
+        if(lsO instanceof String)
+        {
+            ls = new String[] {(String) lsO};
+        } else if(lsO instanceof String[])
+        {
+            ls = (String[]) lsO;
+        } else
+        {
+            log.error("Unable to convert ls into String or String[]");
+            ls = new String[0];
+        }
+        log.info("ls(): " + Arrays.toString(ls));
+        return ls;
     }
     
     public List<String> lsVariables()
@@ -399,6 +417,7 @@ public class RJriConnector implements RConnector
                 if(clazzO instanceof String)
                 {
                     String clazz = (String) clazzO;
+                    log.info("Class of '" + s + "' is '" + clazz + "'");
                     if("function".equals(clazz))
                     {
                         result.add(s);
