@@ -82,7 +82,7 @@ public class RScriptEngine extends ScriptEngine
         {
             if(!Interpreter.internalNames.contains(name))
             {
-                FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "(" + name + ")");
+                FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "('" + name + "')");
                 context.registerFunction(namespace + name, funcspec);
                 log.info("Registered Function: " + name);
             }
