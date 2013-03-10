@@ -27,9 +27,8 @@ public class MainClass {
             String str = "obj <- .jnew(\"com.cwoodson.pigaddons.TestClass\")\n.jcall(obj, \"V\", \"DoSomething\")";
             InputStream is = new ByteArrayInputStream(str.getBytes());
             rc.execfile(is, ".");
-            Object a = rc.eval("a <- function(x) {}");
-            int i = 1;
-            //System.out.println(Arrays.asList(rc.ls()).toString());
+            rc.voidEval("{a <- function() {\n  return(\"Hi\")\n}\nprint(\"Hi\")}");
+            System.out.println(Arrays.toString(rc.ls()));
         } catch(Exception e) {
             System.err.println(e);
             e.printStackTrace();
