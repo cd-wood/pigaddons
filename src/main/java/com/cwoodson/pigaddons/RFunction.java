@@ -44,10 +44,10 @@ public class RFunction extends EvalFunc<Object> {
             Object schemaObj = rEngine.eval("attributes(" + functionName + ")$outputSchema");
             if (schemaObj != null && schemaObj instanceof String && !((String) schemaObj).isEmpty()) {
                 String outputSchemaStr = (String) schemaObj;
-                logger.debug("Output Schema Attribute for RFunction '" + functionName + "' detected: " + outputSchema);
+                logger.info("Output Schema Attribute for RFunction '" + functionName + "' detected: " + outputSchema);
                 try {
                     this.outputSchema = Utils.getSchemaFromString(outputSchemaStr);
-                    logger.debug("Output Schema create for RFunction '" + functionName + "'");
+                    logger.info("Output Schema create for RFunction '" + functionName + "'");
                 } catch (ParserException pe) {
                     throw new IllegalArgumentException("RFunction " + functionName + " has invalid output schema: " + outputSchemaStr, pe);
                 }
