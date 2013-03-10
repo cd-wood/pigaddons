@@ -5,6 +5,7 @@
 package com.cwoodson.pigaddons.rutils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.nuiton.j2r.REngine;
+import org.nuiton.j2r.REngineAbstract;
 import org.nuiton.j2r.RException;
 import org.nuiton.j2r.RInstructions;
 import org.nuiton.j2r.jni.RJniEngine;
@@ -29,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author connor-woodson
  */
-public class RJriConnector implements RConnector
+public class RJriConnector extends REngineAbstract implements RConnector
 {
     private static final Logger log = LoggerFactory.getLogger(RJriConnector.class);
  
@@ -358,6 +360,7 @@ public class RJriConnector implements RConnector
         }
     }
     
+    @Override
     public String[] ls() throws RException
     {
         String[] ls;
@@ -365,8 +368,9 @@ public class RJriConnector implements RConnector
         if(lsO == null)
         {
             ls = new String[0];
+            log.warn("ls() returned NULL");
         }
-        if(lsO instanceof String)
+        else if(lsO instanceof String)
         {
             ls = new String[] {(String) lsO};
         } else if(lsO instanceof String[])
@@ -381,6 +385,7 @@ public class RJriConnector implements RConnector
         return ls;
     }
     
+    @Override
     public List<String> lsVariables()
     {
         List<String> result = new ArrayList<String>();
@@ -407,6 +412,7 @@ public class RJriConnector implements RConnector
         return result;
     }
     
+    @Override
     public List<String> lsFunctions()
     {
         List<String> result = new ArrayList<String>();
@@ -443,5 +449,16 @@ public class RJriConnector implements RConnector
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Object evalScript(String expr) throws RException {
+        execfile(new ByteArrayInputStream(expr.getBytes()), "");
+        return null;
+    }
+
+    @Override
+    public void commit() throws RException {
+        // do nothing
     }
 }
