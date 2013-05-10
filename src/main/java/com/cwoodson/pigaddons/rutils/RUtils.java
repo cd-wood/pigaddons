@@ -54,9 +54,9 @@ public class RUtils {
                 result.add(rs);
             }
         }
-        return null;
+        return result;
     }
-
+    
     public static RList pigMapToR(Map<String, Object> map, Schema schema, int depth, REngine engine) throws RException {
         List<String> names = new ArrayList<String>(map.size());
         List<Object> data = new ArrayList<Object>(map.size());

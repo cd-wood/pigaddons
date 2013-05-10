@@ -4,21 +4,18 @@
  */
 package com.cwoodson.pigaddons.rutils;
 
+import com.cwoodson.pigaddons.rtypes.RDataFrame;
+import com.cwoodson.pigaddons.rtypes.RList;
+import com.cwoodson.pigaddons.rtypes.RType;
+import com.cwoodson.pigaddons.rtypes.RPrimitive;
+import com.cwoodson.pigaddons.rtypes.RPrimitiveArray;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.nuiton.j2r.REngine;
-import org.nuiton.j2r.REngineAbstract;
-import org.nuiton.j2r.RException;
-import org.nuiton.j2r.RInstructions;
-import org.nuiton.j2r.jni.RJniEngine;
-import org.nuiton.j2r.types.RDataFrame;
-import org.nuiton.j2r.types.RList;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
@@ -31,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author connor-woodson
  */
-public class RJriConnector extends REngineAbstract implements RConnector
+public class RJriConnector implements RConnector
 {
     private static final Logger log = LoggerFactory.getLogger(RJriConnector.class);
  
@@ -89,22 +86,22 @@ public class RJriConnector extends REngineAbstract implements RConnector
      *
      * @return the java object corresponding to the R expression.
      */
-    private Object convertResult(REXP rexp) {
+    private RType convertResult(REXP rexp) throws RException {
         if (rexp == null) {
             log.info("Null returned");
             return null;
         }
         log.info("Converting : " + rexp.toString());
         int type = rexp.getType();
-        Object result = null;
+        RType result = null;
         switch (type) {
             case REXP.XT_STR:
                 //If string return the r expression as string
-                result = rexp.asString();
+                result = new RPrimitive(rexp.asString());
                 break;
             case REXP.XT_INT:
                 //if integer, return the rexp as integer
-                result = (Integer) rexp.asInt();
+                result = new RPrimitive((Integer) rexp.asInt());
                 break;
             case REXP.XT_ARRAY_INT:
                 int[] array = rexp.asIntArray();
@@ -112,10 +109,12 @@ public class RJriConnector extends REngineAbstract implements RConnector
                 for (int i = 0; i < array.length; i++) {
                     bigArray[i] = (Integer) array[i];
                 }
-                result = bigArray;
+                
                 //Check if only one integer, return an integer.
                 if (array.length == 1) {
-                    result = (Integer) array[0];
+                    result = new RPrimitive((Integer) bigArray[0]);
+                } else {
+                    result = new RPrimitiveArray(bigArray);
                 }
                 break;
             case REXP.XT_ARRAY_DOUBLE:
@@ -125,31 +124,31 @@ public class RJriConnector extends REngineAbstract implements RConnector
                 for (int i = 0; i < doublearray.length; i++) {
                     bigdoublearray[i] = (Double) doublearray[i];
                 }
-                result = bigdoublearray;
+                
                 //Check if only one double, return a double.
                 if (doublearray.length == 1) {
-                    result = doublearray[0];
+                    result = new RPrimitive(bigdoublearray[0]);
+                } else {
+                    result = new RPrimitiveArray(bigdoublearray);
                 }
                 break;
             case REXP.XT_BOOL:
                 //if boolean, return rexp as boolean
-                result = rexp.asBool().isTRUE();
+                result = new RPrimitive(rexp.asBool().isTRUE());
                 break;
             case REXP.XT_DOUBLE:
                 //if double, return rexp as double
                 //Get a double array
-                result = rexp.asDoubleArray();
                 //return only the first element.
-                result = (Double) ((double[]) result)[0];
+                result = new RPrimitive((Double) ((double[]) rexp.asDoubleArray())[0]);
                 break;
             case REXP.XT_NULL:
                 //if null return null
-                result = null;
+                result = new RPrimitive();
                 break;
             case REXP.XT_ARRAY_BOOL_INT:
                 //if boolean array, get the rexp as integer array (full of 0 and 1)
-                result = rexp.asIntArray();
-                int[] integers = ((int[]) result);
+                int[] integers = ((int[]) rexp.asIntArray());
                 Boolean[] booleanArray = new Boolean[integers.length];
                 //transform the 0 and 1 in true and false in a boolean array
                 for (int i = 0; i < integers.length; i++) {
@@ -161,31 +160,25 @@ public class RJriConnector extends REngineAbstract implements RConnector
                 }
                 //check if there is only a boolean, return a boolean
                 if (booleanArray.length == 1) {
-                    result = booleanArray[0];
+                    result = new RPrimitive(booleanArray[0]);
                 } else {
-                    result = booleanArray;
+                    result = new RPrimitiveArray(booleanArray);
                 }
                 //return the boolean array
                 break;
             case REXP.XT_ARRAY_STR:
                 //if is a string array, return as a string array.
-                result = rexp.asStringArray();
+                result = new RPrimitiveArray(rexp.asStringArray());
                 break;
             case REXP.XT_VECTOR:
                 //dataframes, lists and vectors are recognized as vectors.
-                //get the class of the vector (to successfully detect data.frames)
-                String klass = "";
-                REXP klassAttribute = rexp.getAttribute(
-                    RInstructions.ATTRIBUTE_CLASS);
-                if (klassAttribute != null) {
-                    klass = klassAttribute.asString();
-                }
+                
                 //get REXP asList to successfully detect lists.
                 org.rosuda.JRI.RList list = rexp.asList();
-                if (klass.equals(RInstructions.CLASS_DATAFRAME)) {
+                if (RHelpers.isDataframe(rexp)) {
 
                     //if rexp is a data.frame
-                    RDataFrame temp = new RDataFrame((REngine) this);
+                    RDataFrame temp = new RDataFrame();
 
                     //create the data list.
                     List<List<? extends Object>> data =
@@ -195,11 +188,13 @@ public class RJriConnector extends REngineAbstract implements RConnector
                     for (int i = 0; i < dataList.keys().length; i++) {
                         //for each vector, create a list and fill it with the
                         //content of the vector.
-                        List<Object> templist = new ArrayList<Object>();
                         REXP tempREXP = dataList.at(i);
-                        Object[] convertedREXP = (Object[]) convertResult(
-                            tempREXP);
-                        templist = Arrays.asList(convertedREXP);
+                        RType convertedREXP = convertResult(tempREXP);
+                        List<Object> templist = convertedREXP.asList();
+                        if(templist == null) {
+                            log.error("Failed to convert rexp to RList while building dataframe: " + tempREXP.asString());
+                            templist = new ArrayList<Object>();
+                        }
                         //add this list to the data list.
                         data.add(templist);
 
@@ -207,13 +202,12 @@ public class RJriConnector extends REngineAbstract implements RConnector
                     //Create a new dataframe with the names, row.names and data
                     //gotten from rexp. It has no variable name so throws a
                     //RException.
-                    temp = new RDataFrame((REngine) this, rexp.getAttribute(
-                        RInstructions.ATTRIBUTE_NAMES).asStringArray(),
-                        rexp.getAttribute(RInstructions.ATTRIBUTE_ROWNAMES).asStringArray(),
-                        data, "");
+                    temp = new RDataFrame(rexp.getAttribute(
+                        "names").asStringArray(),
+                        rexp.getAttribute("row.names").asStringArray(),
+                        data);
                     result = temp;
                 } else if (list != null) {
-                    RList temp = new RList((REngine) this);
                     List<Object> data = new ArrayList<Object>();
                     org.rosuda.JRI.RList dataList = rexp.asList();
                     for (int i = 0; i < dataList.keys().length; i++) {
@@ -225,23 +219,12 @@ public class RJriConnector extends REngineAbstract implements RConnector
                         data.add(convertedREXP);
 
                     }
-                    //Create a new list with the names and data
-                    //gotten from rexp. It has no variable name so throws a
-                    //RException.
-                    try {
-                        temp = new RList(
-                            rexp.getAttribute(RInstructions.ATTRIBUTE_NAMES).asStringArray(),
-                            data, (REngine) this, "");
-                    } catch (RException re) {
-                        //don't propagate the error as it is normal. Log it for debug.
-                        log.info(
-                                "Converting REXP to RList. Creating list without variable name");
-                    }
-                    result = temp;
+                    result = new RList(
+                        rexp.getAttribute("names").asStringArray(),
+                        data);
                 } else {
                     return vectorToList(rexp.asVector());
                 }
-
                 break;
             default:
                 //if don't know the type, throw an exception.
@@ -281,40 +264,27 @@ public class RJriConnector extends REngineAbstract implements RConnector
 
         //encapsulate the R expression in a try method/object to get the R error
         //message if thrown
-        log.info(String.format(RInstructions.RTRY, expr));
-        REXP r = engine.eval(String.format(RInstructions.RTRY, expr));
-        if ((null != r) && (null != r.getAttribute(RInstructions.ATTRIBUTE_CLASS))) {
-            //if the "class" attribute of the R expression is "try-error"
-            //throw a new exception with the error message from R.
-            String classe = r.getAttribute(RInstructions.ATTRIBUTE_CLASS).asString();
-            if (classe.equals(RInstructions.CLASS_ERROR)) {
-                throw new RException(r.asString());
-            }
+        String call = RHelpers.safeCall(expr);
+        log.info(call);
+        REXP r = engine.eval(call);
+        if (r != null && RHelpers.isError(r)) {
+            throw new RException(r.asString());
         }
     }
     
     @Override
-    public Object eval(String expr) throws RException
+    public RType eval(String expr) throws RException
     {
-        REXP result = null;
-        log.info(String.format(RInstructions.RTRY, expr));
-        
-        //encapsulate the R expression in a try method/object to get the R error
-        //message if thrown
-        result = engine.eval(String.format(RInstructions.RTRY, expr));
-        if (result.getAttribute(RInstructions.ATTRIBUTE_CLASS) != null) {
-            //if the "class" attribute of the R expression is "try-error"
-            //throw a new exception with the error message from R.
-            String klass =
-                result.getAttribute(RInstructions.ATTRIBUTE_CLASS).asString();
-            if (klass.equals(RInstructions.CLASS_ERROR)) {
-                throw new RException(result.asString());
-            }
+        String call = RHelpers.safeCall(expr);
+        log.info(call);
+        REXP r = engine.eval(call);
+        if (r != null && RHelpers.isError(r)) {
+            throw new RException(r.asString());
         }
-        return convertResult(result);
+        return convertResult(r);
     }
     
-    private RList vectorToList(RVector vec)
+    private RList vectorToList(RVector vec) throws RException
     {
         List<String> names = vec.getNames();
         List<Object> data = new ArrayList<Object>(names.size());
@@ -325,7 +295,7 @@ public class RJriConnector extends REngineAbstract implements RConnector
         }
         RList list = null;
         try {
-            list = new RList(names.toArray(new String[0]), data, (REngine) this, "");
+            list = new RList(names.toArray(new String[0]), data);
         } catch(RException re) {
             log.warn("Try-Catch in RJriConnector.vectorToList unexpectedly reached", re);
         }
@@ -333,7 +303,7 @@ public class RJriConnector extends REngineAbstract implements RConnector
     }
 
     @Override
-    public void execfile(InputStream scriptStream, String path) throws RException
+    public void execFile(InputStream scriptStream, String path) throws RException
     {
         BufferedReader in = new BufferedReader(new InputStreamReader(scriptStream));
         log.info("Executing R File: " + path);
@@ -449,16 +419,5 @@ public class RJriConnector extends REngineAbstract implements RConnector
         } else {
             return null;
         }
-    }
-
-    @Override
-    public Object evalScript(String expr) throws RException {
-        execfile(new ByteArrayInputStream(expr.getBytes()), "");
-        return null;
-    }
-
-    @Override
-    public void commit() throws RException {
-        // do nothing
     }
 }

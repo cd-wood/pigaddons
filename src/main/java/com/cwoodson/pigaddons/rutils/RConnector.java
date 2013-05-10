@@ -6,7 +6,6 @@ package com.cwoodson.pigaddons.rutils;
 
 import java.io.InputStream;
 import java.util.List;
-import org.nuiton.j2r.RException;
 
 /**
  *
@@ -18,7 +17,7 @@ public interface RConnector
     
     void terminate() throws RException;
     
-    void execfile(InputStream scriptStream, String path) throws RException;
+    String[] ls() throws RException;
     
     List<String> lsVariables();
     
@@ -27,4 +26,6 @@ public interface RConnector
     Object eval(String expr) throws RException;
     
     void voidEval(String expr) throws RException;
+    
+    void execFile(InputStream input, String path) throws RException;
 }

@@ -4,10 +4,13 @@
  */
 package com.cwoodson.pigaddons;
 
+import com.cwoodson.pigaddons.rtypes.RList;
 import com.cwoodson.pigaddons.rutils.RConnector;
+import com.cwoodson.pigaddons.rutils.RException;
 import com.cwoodson.pigaddons.rutils.RUtils;
 import com.cwoodson.pigaddons.rutils.RUtils.REXPStr;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -18,9 +21,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.util.UDFContext;
 import org.apache.pig.impl.util.Utils;
 import org.apache.pig.parser.ParserException;
-import org.nuiton.j2r.REngine;
-import org.nuiton.j2r.RException;
-import org.nuiton.j2r.types.REXP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class RFunction extends EvalFunc<Object> {
         }
         Object functionResult = null;
         try {
-            List<REXPStr> params = RUtils.pigTupleToR(tuple, inputSchema, 0, (REngine) rEngine);
+            List<REXPStr> params = RUtils.pigTupleToR(tuple, inputSchema, 0, rEngine);
             String paramString = "";
             for (int i = 0; i < params.size(); i++) {
 
@@ -84,9 +84,23 @@ public class RFunction extends EvalFunc<Object> {
             throw new IOException("R Function Execution failed", ex);
         }
         
-        Tuple evalTuple = null;//RUtils.rToPigTuple(functionResult, outputSchema, 0);
-        Object eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
-
+        Object eval = null;
+        try {
+            RList resultList;
+            if(functionResult instanceof RList)
+            {
+                resultList = (RList) functionResult;
+            } else {
+                List<Object> asList = new ArrayList<Object>(1);
+                asList.add(functionResult);
+                resultList = new RList(new String[] {""}, asList, rEngine, "");
+            }
+            Tuple evalTuple = RUtils.rToPigTuple(resultList, outputSchema, 0);
+            eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
+        } catch(RException ex) {
+            throw new IOException("RList conversion failed", ex);
+        }
+        
         return eval;
     }
 

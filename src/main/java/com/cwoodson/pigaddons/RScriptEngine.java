@@ -16,7 +16,6 @@ import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.impl.PigContext;
 import org.apache.pig.scripting.ScriptEngine;
 import org.apache.pig.tools.pigstats.PigStats;
-import org.nuiton.j2r.RException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ public class RScriptEngine extends ScriptEngine
         static void execFile(InputStream script, String path, PigContext pigContext) throws ExecException
         {
             try {
-                rEngine.execfile(script, path);
+                rEngine.execFile(script, path);
             } catch(RException re) {
                 throw new ExecException(re);
             }
