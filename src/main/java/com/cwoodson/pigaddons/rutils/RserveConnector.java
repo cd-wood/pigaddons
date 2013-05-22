@@ -4,6 +4,7 @@
  */
 package com.cwoodson.pigaddons.rutils;
 
+import com.cwoodson.pigaddons.rtypes.RType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class RserveConnector implements RConnector
     }
 
     @Override
-    public Object eval(String expr) throws com.cwoodson.pigaddons.rutils.RException {
+    public RType eval(String expr) throws com.cwoodson.pigaddons.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

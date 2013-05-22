@@ -33,41 +33,6 @@ public class RDataFrame extends RType
     /**
      * Constructor
      *
-     * @param datatypes a table object determining the type of each column of
-     * the data.frame.
-     * @param y the length of each vector that compound the data.frame.
-     */
-    public RDataFrame(Object[] datatypes, int y) throws RException
-    {
-        this.names = new ArrayList<String>();
-        this.rowNames = new ArrayList<String>();
-        this.data = new ArrayList<List<? extends Object>>();
-        for (int i = 0; i < datatypes.length; i++) {
-            //create one column for each datatype element
-            //check if type is supported
-            checkType(datatypes[i]);
-            //create the list of objects
-            List<Object> column = new ArrayList<Object>();
-            //Fill it with instances of the datatype
-            for (int j = 0; j < y; j++) {
-                if (datatypes[i] instanceof Double) {
-                    column.add(0.0);
-                } else if (datatypes[i] instanceof Integer) {
-                    column.add(0);
-                } else if (datatypes[i] instanceof Boolean) {
-                    column.add(true);
-                } else if (datatypes[i] instanceof String) {
-                    column.add("");
-                }
-            }
-            //add the column to the dataframe.
-            data.add(column);
-        }
-    }
-
-    /**
-     * Constructor
-     *
      * @param names names of the the data.frame columns.
      * @param rowNames names of the data.frame rows.
      * @param data the data of the data.frame
@@ -75,7 +40,7 @@ public class RDataFrame extends RType
      * initialize 
      */
     public RDataFrame(List<String> names,
-            List<String> rowNames, List<List<? extends Object>> data) throws RException
+            List<String> rowNames, List<List<? extends Object>> data)
     {
         this.names = names;
         this.rowNames = rowNames;
@@ -83,7 +48,7 @@ public class RDataFrame extends RType
     }
 
     public RDataFrame(String[] asStringArray,
-			String[] asStringArray2, List<List<? extends Object>> data2) throws RException {
+			String[] asStringArray2, List<List<? extends Object>> data2) {
 		this(Arrays.asList(asStringArray), Arrays.asList(asStringArray2), data2);
 	}
 
@@ -140,7 +105,7 @@ public class RDataFrame extends RType
      *             If no variable name is given
      */
     @Override
-    public String toRString() throws RException
+    public String toRString()
     {
         String returnString = "data.frame(";
         if (!(this.data.isEmpty())) {
@@ -199,12 +164,5 @@ public class RDataFrame extends RType
     @Override
     public String toString() {
         return "";
-    }
-    
-    private void checkType(Object o) throws RException {
-        if (!(o instanceof String) && !(o instanceof Double) &&
-                !(o instanceof Integer) && !(o instanceof Boolean)) {
-            throw new RException("Not supported type");
-        }
     }
 }

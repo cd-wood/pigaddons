@@ -4,6 +4,7 @@
  */
 package com.cwoodson.pigaddons.rutils;
 
+import com.cwoodson.pigaddons.rtypes.RType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface RConnector
     
     List<String> lsFunctions();
     
-    Object eval(String expr) throws RException;
+    RType eval(String expr) throws RException;
     
     void voidEval(String expr) throws RException;
     

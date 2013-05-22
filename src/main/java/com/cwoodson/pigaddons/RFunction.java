@@ -4,13 +4,15 @@
  */
 package com.cwoodson.pigaddons;
 
+import com.cwoodson.pigaddons.rtypes.RDataFrame;
 import com.cwoodson.pigaddons.rtypes.RList;
+import com.cwoodson.pigaddons.rtypes.RType;
 import com.cwoodson.pigaddons.rutils.RConnector;
 import com.cwoodson.pigaddons.rutils.RException;
 import com.cwoodson.pigaddons.rutils.RUtils;
-import com.cwoodson.pigaddons.rutils.RUtils.REXPStr;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -52,6 +54,7 @@ public class RFunction extends EvalFunc<Object> {
                     throw new IllegalArgumentException("RFunction " + functionName + " has invalid output schema: " + outputSchemaStr, pe);
                 }
             } else {
+                logger.warn("Output Schema Attribute for RFunction '" + functionName + "' missing");
                 this.outputSchema = null;
             }
         } catch (RException re) {
@@ -66,41 +69,27 @@ public class RFunction extends EvalFunc<Object> {
         if (inputSchema.size() == 1 && inputSchema.getField(0).type == DataType.TUPLE) {
             inputSchema = inputSchema.getField(0).schema;
         }
-        Object functionResult = null;
+        RList result_list;
         try {
-            List<REXPStr> params = RUtils.pigTupleToR(tuple, inputSchema, 0, rEngine);
-            String paramString = "";
-            for (int i = 0; i < params.size(); i++) {
-
-                String rStr = params.get(i).rexp.toRString();
-                if (rStr.startsWith("<-")) {
-                    rStr = rStr.substring(2);
-                }
-                paramString += rStr + ",";
+            List<RType> params = RUtils.pigTupleToR(tuple, inputSchema, 0).expand();
+            String paramStr = params.isEmpty() ? "" : params.get(0).toRString();
+            for(int i = 1; i < params.size(); i++) {
+                paramStr += ", " + params.get(i);
             }
-            paramString = paramString.substring(0, paramString.length() - 1);
-            functionResult = rEngine.eval(functionName + "(" + paramString + ")");
+            RType result = rEngine.eval(functionName + "(" + paramStr + ")");
+            if(result instanceof RDataFrame) {
+                throw new UnsupportedOperationException("R-Pig does not currently support DataFrames");
+            } else if(!(result instanceof RList)) { // wrap any other RType
+                result_list = new RList(new String[] {"result"}, Arrays.asList(new Object[] {result}));
+            } else {
+                result_list = (RList) result;
+            }
         } catch (RException ex) {
             throw new IOException("R Function Execution failed", ex);
         }
         
-        Object eval = null;
-        try {
-            RList resultList;
-            if(functionResult instanceof RList)
-            {
-                resultList = (RList) functionResult;
-            } else {
-                List<Object> asList = new ArrayList<Object>(1);
-                asList.add(functionResult);
-                resultList = new RList(new String[] {""}, asList, rEngine, "");
-            }
-            Tuple evalTuple = RUtils.rToPigTuple(resultList, outputSchema, 0);
-            eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
-        } catch(RException ex) {
-            throw new IOException("RList conversion failed", ex);
-        }
-        
+        Tuple evalTuple = RUtils.rToPigTuple(result_list, outputSchema, 0);
+        Object eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
         return eval;
     }
 

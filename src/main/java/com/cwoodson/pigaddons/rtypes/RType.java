@@ -6,11 +6,11 @@ import java.util.List;
 
 public abstract class RType
 {
-	public abstract String toRString() throws RException;
+	public abstract String toRString();
         
         public abstract List<Object> asList();
         
-        public String toRString(String var) throws RException {
+        public String toRString(String var) {
             return var + " <- " + toRString();
         }
         

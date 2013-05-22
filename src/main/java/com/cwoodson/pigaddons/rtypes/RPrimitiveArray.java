@@ -14,7 +14,7 @@ public class RPrimitiveArray extends RType
 		this.data = null;
 	}
 	
-    public RPrimitiveArray(Object[] data) throws RException
+    public RPrimitiveArray(Object[] data)
     {
         this.data = data;
     }
@@ -28,8 +28,12 @@ public class RPrimitiveArray extends RType
         }
     }
     
+    public Object[] getValue() {
+        return data;
+    }
+    
     @Override
-    public String toRString() throws RException
+    public String toRString()
     {
         String output = "c(";
         if(data == null || data.length == 0)

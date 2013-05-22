@@ -37,19 +37,63 @@ public class RList extends RType
      * @throws org.nuiton.j2r.RException if an error occur while initializing
      * the list in R.
      */
-    public RList(List<String> names, List<Object> data) throws RException
+    public RList(List<String> names, List<Object> data)
     {
         this.names = names;
         this.data = data;
     }
     
-    public RList(String[] asStringArray, List<Object> data2) throws RException {
+    public RList(String[] asStringArray, List<Object> data2) {
     	this(Arrays.asList(asStringArray), data2);
 	}
 
     
+    @Override
     public List<Object> asList() {
         return data;
+    }
+    
+    public int contains(String name) {
+        int result = -1;
+        for(int i = 0; i < names.size(); i++) {
+            if(names.get(i).equals(name)) {
+                result = i;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    public Object get(int id) {
+        if(id < 0 || id > data.size()) {
+            return null;
+        }
+        return data.get(id);
+    }
+    
+    public List<String> getNames() {
+        return names;
+    }
+    
+    /**
+     * Unwrap the elements of the RList
+     * into a list of RTypes
+     * 
+     * @return 
+     */
+    public List<RType> expand() {
+       List<RType> result = new ArrayList<RType>(data.size());
+       for(int i = 0; i < data.size(); i++) {
+           Object o = data.get(i);
+           if(o instanceof RType) {
+               result.add((RType)o);
+           } else if(o instanceof Object[]) {
+               result.add(new RPrimitiveArray((Object[])o));
+           } else {
+               result.add(new RPrimitive(o));
+           }
+       }
+       return result;
     }
     
 	/**
@@ -60,7 +104,7 @@ public class RList extends RType
      *             If no variable name is given
      */
     @Override
-    public String toRString() throws RException
+    public String toRString()
     {
         StringBuilder returnString = new StringBuilder();
         returnString.append("list(");
@@ -81,7 +125,7 @@ public class RList extends RType
      * @return the corresponding R instruction
      * @throws RException if an error occur creating R instruction for REXPs
      */
-    protected String toRString(int i) throws RException
+    protected String toRString(int i)
     {
         String returnString="";
 

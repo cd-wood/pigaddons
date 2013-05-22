@@ -1,6 +1,5 @@
 package com.cwoodson.pigaddons.rtypes;
 
-import com.cwoodson.pigaddons.rutils.RConnector;
 import com.cwoodson.pigaddons.rutils.RException;
 import com.cwoodson.pigaddons.rutils.RHelpers;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ public class RPrimitive extends RType
 		this.data = null;
 	}
 	
-    public RPrimitive(Object data) throws RException
+    public RPrimitive(Object data)
     {
         this.data = data;
     }
@@ -27,8 +26,12 @@ public class RPrimitive extends RType
         return result;
     }
     
+    public Object getValue() {
+        return data;
+    }
+    
     @Override
-    public String toRString() throws RException
+    public String toRString()
     {
         String output = "";
         if(data == null)

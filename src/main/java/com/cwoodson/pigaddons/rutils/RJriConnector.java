@@ -178,7 +178,7 @@ public class RJriConnector implements RConnector
                 if (RHelpers.isDataframe(rexp)) {
 
                     //if rexp is a data.frame
-                    RDataFrame temp = new RDataFrame();
+                    RDataFrame temp;
 
                     //create the data list.
                     List<List<? extends Object>> data =
@@ -293,12 +293,7 @@ public class RJriConnector implements RConnector
             REXP rVal = vec.at(name);
             data.add(convertResult(rVal));
         }
-        RList list = null;
-        try {
-            list = new RList(names.toArray(new String[0]), data);
-        } catch(RException re) {
-            log.warn("Try-Catch in RJriConnector.vectorToList unexpectedly reached", re);
-        }
+        RList list = new RList(names, data);
         return list;
     }
 
