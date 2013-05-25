@@ -18,7 +18,7 @@ public interface RConnector
     
     void terminate() throws RException;
     
-    String[] ls() throws RException;
+    List<String> ls() throws RException;
     
     List<String> lsVariables();
     

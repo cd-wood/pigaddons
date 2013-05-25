@@ -130,7 +130,7 @@ public class RUtils {
                 } else if(data instanceof RPrimitive) {
                     value = ((RPrimitive)data).getValue();
                 } else if(data instanceof RPrimitiveArray) {
-                    value = ((RPrimitiveArray)data).getValue();
+                    value = ((RPrimitiveArray)data).getArray();
                 } else {
                     value = data;
                 }

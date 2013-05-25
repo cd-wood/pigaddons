@@ -4,7 +4,7 @@ SCRIPT_DIRECTORY=$(dirname $(readlink -f $0))
 RJAVA_VERSION=0.9-4
 R_LIB_DIR=/home/$USER/R_libs
 JRI_HOME=${R_LIB_DIR}/rJava/jri
-RPIG_JAR=$(readlink -f "${SCRIPT_DIRECTORY}/../target/pigaddons-1.0-SNAPSHOT")
+RPIG_JAR=$(readlink -f "${SCRIPT_DIRECTORY}/../target/pigaddons-1.0-SNAPSHOT.jar")
 
 if [ ! -f "${PIG_HOME}/bin/pig" ]
 then

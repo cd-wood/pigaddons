@@ -6,9 +6,9 @@ package com.cwoodson.pigaddons.rpig.rutils;
 
 import com.cwoodson.pigaddons.rpig.rtypes.RDataFrame;
 import com.cwoodson.pigaddons.rpig.rtypes.RList;
-import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
 import com.cwoodson.pigaddons.rpig.rtypes.RPrimitiveArray;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -323,27 +323,22 @@ public class RJriConnector implements RConnector
     }
     
     @Override
-    public String[] ls() throws RException
+    public List<String> ls() throws RException
     {
-        String[] ls;
-        Object lsO =  eval("ls()");
-        if(lsO == null)
-        {
-            ls = new String[0];
+        List<String> ls = new ArrayList<String>();
+        List<Object> lsO =  eval("ls()").asList();
+        if(lsO == null) {
             log.warn("ls() returned NULL");
         }
-        else if(lsO instanceof String)
-        {
-            ls = new String[] {(String) lsO};
-        } else if(lsO instanceof String[])
-        {
-            ls = (String[]) lsO;
-        } else
-        {
-            log.error("Unable to convert ls into String or String[]");
-            ls = new String[0];
+        else {
+            for(Object o : lsO) {
+                if(o instanceof String) {
+                    ls.add((String)o);
+                } else {
+                    log.warn("ls element '" + lsO.toString() + "' not of type String");
+                }
+            }
         }
-        log.info("ls(): " + Arrays.toString(ls));
         return ls;
     }
     
@@ -352,11 +347,11 @@ public class RJriConnector implements RConnector
     {
         List<String> result = new ArrayList<String>();
         try {
-            String[] names = ls();
-            for(String s : names)
+            for(String s : ls())
             {
-                Object clazzO = eval("class(" + s + ")");
-                if(clazzO instanceof String)
+                RType clazzRT = eval("class(" + s + ")");
+                Object clazzO;
+                if(clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive)clazzRT).getValue()) instanceof String)
                 {
                     String clazz = (String) clazzO;
                     if(!"function".equals(clazz))
@@ -379,11 +374,11 @@ public class RJriConnector implements RConnector
     {
         List<String> result = new ArrayList<String>();
         try {
-            String[] names = ls();
-            for(String s : names)
+            for(String s : ls())
             {
-                Object clazzO = eval("class(" + s + ")");
-                if(clazzO instanceof String)
+                RType clazzRT = eval("class(" + s + ")");
+                Object clazzO;
+                if(clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive)clazzRT).getValue()) instanceof String)
                 {
                     String clazz = (String) clazzO;
                     log.info("Class of '" + s + "' is '" + clazz + "'");

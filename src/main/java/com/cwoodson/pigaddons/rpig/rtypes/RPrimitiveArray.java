@@ -28,7 +28,7 @@ public class RPrimitiveArray extends RType
         }
     }
     
-    public Object[] getValue() {
+    public Object[] getArray() {
         return data;
     }
     
