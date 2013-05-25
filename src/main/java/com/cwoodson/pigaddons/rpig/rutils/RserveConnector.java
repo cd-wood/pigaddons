@@ -41,7 +41,7 @@ public class RserveConnector implements RConnector
     }
 
     @Override
-    public String[] ls() throws com.cwoodson.pigaddons.rpig.rutils.RException {
+    public List<String> ls() throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
