@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
@@ -229,6 +228,7 @@ public class RJriConnector implements RConnector
                     rexp.toString());
                 break;
         }
+        log.info("Conversion complete: " + result.toString());
         return result;
     }
 
