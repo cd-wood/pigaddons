@@ -21,6 +21,8 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,6 +30,8 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  */
 public class RUtils {
 
+    private static Logger logger = LoggerFactory.getLogger(RUtils.class);
+    
     private RUtils() {
     }
 
@@ -101,7 +105,7 @@ public class RUtils {
             FieldSchema field = schema.getField(i);
             int index = object.contains(field.alias);
             Object data = null;
-            if((index >= 0) || ((data = object.get(index)) == null)) {
+            if((index >= 0) && ((data = object.get(index)) != null)) {
                 byte type = field.type;
                 Object value;
                 if(type == DataType.BAG)
@@ -132,7 +136,7 @@ public class RUtils {
                 }
                 t.set(i, value);
             } else {
-                // name not found in set
+                logger.warn("RList does not contain name specified by schema: " + field.alias + "[" + object.toRString() + "]");
             }
         }
         return t;
@@ -149,7 +153,7 @@ public class RUtils {
             if(obj instanceof RList) {
                 bag.add(rToPigTuple((RList)obj, schema, depth + 1));
             } else {
-                // RList seems wrong
+                logger.warn("Interpreted RList as a DataBag, but list does contains something other than an RList {" + object.toRString() + "}");
             }
         }
         DataBag result = BagFactory.getInstance().newDefaultBag(bag);
