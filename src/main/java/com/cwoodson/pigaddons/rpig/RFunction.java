@@ -45,7 +45,7 @@ public class RFunction extends EvalFunc<Object> {
             RType schemaObj = rEngine.eval("attributes(" + functionName + ")$outputSchema");
             if (schemaObj != null && schemaObj instanceof RPrimitive) {
                 String outputSchemaStr = (String)((RPrimitive)schemaObj).getValue();
-                logger.info("Output Schema Attribute for RFunction '" + functionName + "' detected: " + outputSchema);
+                logger.info("Output Schema Attribute for RFunction '" + functionName + "' detected: " + outputSchemaStr);
                 try {
                     this.outputSchema = Utils.getSchemaFromString(outputSchemaStr);
                     logger.info("Output Schema created for RFunction '" + functionName + "'");
@@ -63,8 +63,6 @@ public class RFunction extends EvalFunc<Object> {
 
     @Override
     public Object exec(Tuple tuple) throws IOException {
-        Schema localInputSchema = this.getInputSchema();
-
         if (inputSchema.size() == 1 && inputSchema.getField(0).type == DataType.TUPLE) {
             inputSchema = inputSchema.getField(0).schema;
         }
@@ -79,7 +77,7 @@ public class RFunction extends EvalFunc<Object> {
             if(result instanceof RDataFrame) {
                 throw new UnsupportedOperationException("R-Pig does not currently support DataFrames");
             } else if(!(result instanceof RList)) { // wrap any other RType
-                result_list = new RList(new String[] {"result"}, Arrays.asList(new Object[] {result}));
+                result_list = new RList(new String[] {outputSchema.getField(0).alias}, Arrays.asList(new Object[] {result}));
             } else {
                 result_list = (RList) result;
             }

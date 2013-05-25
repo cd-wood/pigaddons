@@ -136,7 +136,7 @@ public class RUtils {
                 }
                 t.set(i, value);
             } else {
-                logger.warn("RList does not contain name specified by schema: " + field.alias + "[" + object.toRString() + "]");
+                logger.warn("RList does not contain name specified by schema: " + field.alias + " [" + object.toRString() + "]");
             }
         }
         return t;
