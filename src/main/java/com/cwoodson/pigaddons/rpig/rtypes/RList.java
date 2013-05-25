@@ -156,7 +156,13 @@ public class RList extends RType
     }
     
     @Override
-    public String toString()
+    public String toString() {
+        // I don't know what to put here
+        return "";
+    }
+    
+    @Override
+    public String toDecoratedString()
     {
     	if(data == null)
     	{

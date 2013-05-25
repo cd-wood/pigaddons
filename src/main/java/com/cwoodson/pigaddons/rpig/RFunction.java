@@ -6,16 +6,15 @@ package com.cwoodson.pigaddons.rpig;
 
 import com.cwoodson.pigaddons.rpig.rtypes.RDataFrame;
 import com.cwoodson.pigaddons.rpig.rtypes.RList;
+import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
 import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import com.cwoodson.pigaddons.rpig.rutils.RConnector;
 import com.cwoodson.pigaddons.rpig.rutils.RException;
 import com.cwoodson.pigaddons.rpig.rutils.RUtils;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
@@ -43,9 +42,9 @@ public class RFunction extends EvalFunc<Object> {
         this.functionName = functionName;
 
         try {
-            Object schemaObj = rEngine.eval("attributes(" + functionName + ")$outputSchema");
-            if (schemaObj != null && schemaObj instanceof String && !((String) schemaObj).isEmpty()) {
-                String outputSchemaStr = (String) schemaObj;
+            RType schemaObj = rEngine.eval("attributes(" + functionName + ")$outputSchema");
+            if (schemaObj != null && schemaObj instanceof RPrimitive) {
+                String outputSchemaStr = schemaObj.toString();
                 logger.info("Output Schema Attribute for RFunction '" + functionName + "' detected: " + outputSchema);
                 try {
                     this.outputSchema = Utils.getSchemaFromString(outputSchemaStr);
@@ -54,7 +53,7 @@ public class RFunction extends EvalFunc<Object> {
                     throw new IllegalArgumentException("RFunction " + functionName + " has invalid output schema: " + outputSchemaStr, pe);
                 }
             } else {
-                logger.warn("Output Schema Attribute for RFunction '" + functionName + "' missing");
+                logger.warn("Output Schema Attribute for RFunction '" + functionName + "' missing or improperly declared");
                 this.outputSchema = null;
             }
         } catch (RException re) {

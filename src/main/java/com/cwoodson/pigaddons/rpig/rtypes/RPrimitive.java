@@ -59,11 +59,16 @@ public class RPrimitive extends RType
     }
     
     @Override
-    public String toString()
+    public String toString() {
+        return (data == null) ? "" : data.toString();
+    }
+    
+    @Override
+    public String toDecoratedString()
     {
     	if(data == null)
     	{
-    		return null;
+    		return "NULL";
     	}
     	
     	return "[1]\t" + data.toString();

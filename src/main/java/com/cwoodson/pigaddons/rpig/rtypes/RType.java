@@ -20,4 +20,8 @@ public abstract class RType
         
         @Override
 	public abstract String toString();
+        
+        // This will produce a string that can be
+        // Viewed in a console
+        public abstract String toDecoratedString();
 }

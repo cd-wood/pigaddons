@@ -163,6 +163,13 @@ public class RDataFrame extends RType
     
     @Override
     public String toString() {
+        // I don't know what to put here
+        return "";
+    }
+    
+    @Override
+    public String toDecoratedString() {
+        // This will take some work
         return "";
     }
 }
