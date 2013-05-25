@@ -15,9 +15,12 @@ sudo apt-get install -y r-base
 export R_HOME="$(R RHOME)"
 
 mkdir -p ${R_LIB_DIR}
-wget -O ${R_LIB_DIR}/rJava_${RJAVA_VERSION}.tar.gz http://cran.r-project.org/src/contrib/rJava_${RJAVA_VERSION}.tar.gz
+if [ ! -f "${R_LIB_DIR}/rJava_${RJAVA_VERSION}.tar.gz" ]
+then
+  wget -O ${R_LIB_DIR}/rJava_${RJAVA_VERSION}.tar.gz http://cran.r-project.org/src/contrib/rJava_${RJAVA_VERSION}.tar.gz
+fi
 R CMD INSTALL -l ${R_LIB_DIR} ${R_LIB_DIR}/rJava_0.9-4.tar.gz
 
-echo "export =${JRI_HOME}" >>| ${PIG_HOME}/conf/pig-env.sh
-echo "export R_HOME=${R_HOME}" >>| ${PIG_HOME}/conf/pig-env.sh
-echo "export PIG_OPTS=\"\${PIG_OPTS} -Djava.library.path=\${JRI_HOME}:\${R_HOME}\" -Drpig.libs=\"${R_LIB_DIR}\" -Drpig.gfx.width=640 -Drpig.gfx.height=480 -Drpig.gfx.ps=12" >>| ${PIG_HOME}/conf/pig-env.sh
+echo "export JRI_HOME=${JRI_HOME}" >> ${PIG_HOME}/conf/pig-env.sh
+echo "export R_HOME=${R_HOME}" >> ${PIG_HOME}/conf/pig-env.sh
+echo "export PIG_OPTS=\"\${PIG_OPTS} -Djava.library.path=\${JRI_HOME}:\${R_HOME}\" -Drpig.libs=\"${R_LIB_DIR}\" -Drpig.gfx.width=640 -Drpig.gfx.height=480 -Drpig.gfx.ps=12" >> ${PIG_HOME}/conf/pig-env.sh
