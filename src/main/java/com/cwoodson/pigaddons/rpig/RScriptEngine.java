@@ -4,13 +4,12 @@
  */
 package com.cwoodson.pigaddons.rpig;
 
-import com.cwoodson.pigaddons.rpig.rutils.RJriConnector;
 import com.cwoodson.pigaddons.rpig.rutils.RConnector;
 import com.cwoodson.pigaddons.rpig.rutils.RException;
+import com.cwoodson.pigaddons.rpig.rutils.RJriConnector;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Permission;
 import java.util.*;
 import org.apache.pig.FuncSpec;
 import org.apache.pig.PigServer;
@@ -47,7 +46,7 @@ public class RScriptEngine extends ScriptEngine
                 if(rLibs == null || rLibs.isEmpty()) {
                     rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
                 } else {
-                    rEngine.voidEval(".libsPath('" + rLibs + "')");
+                    rEngine.voidEval(".libPaths('" + rLibs + "')");
                 }
                 rEngine.voidEval("library('rJava')");
                 rEngine.voidEval(".jinit()");
