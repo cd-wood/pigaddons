@@ -4,7 +4,7 @@
  */
 package com.cwoodson.pigaddons;
 
-import com.cwoodson.pigaddons.rutils.RJriConnector;
+import com.cwoodson.pigaddons.rpig.rutils.RJriConnector;
 import java.io.*;
 import java.util.Arrays;
 

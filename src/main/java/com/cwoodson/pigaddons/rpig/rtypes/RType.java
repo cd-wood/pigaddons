@@ -1,7 +1,7 @@
-package com.cwoodson.pigaddons.rtypes;
+package com.cwoodson.pigaddons.rpig.rtypes;
 
-import com.cwoodson.pigaddons.rutils.RConnector;
-import com.cwoodson.pigaddons.rutils.RException;
+import com.cwoodson.pigaddons.rpig.rutils.RConnector;
+import com.cwoodson.pigaddons.rpig.rutils.RException;
 import java.util.List;
 
 public abstract class RType

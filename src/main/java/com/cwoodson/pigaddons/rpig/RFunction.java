@@ -2,14 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cwoodson.pigaddons;
+package com.cwoodson.pigaddons.rpig;
 
-import com.cwoodson.pigaddons.rtypes.RDataFrame;
-import com.cwoodson.pigaddons.rtypes.RList;
-import com.cwoodson.pigaddons.rtypes.RType;
-import com.cwoodson.pigaddons.rutils.RConnector;
-import com.cwoodson.pigaddons.rutils.RException;
-import com.cwoodson.pigaddons.rutils.RUtils;
+import com.cwoodson.pigaddons.rpig.rtypes.RDataFrame;
+import com.cwoodson.pigaddons.rpig.rtypes.RList;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rutils.RConnector;
+import com.cwoodson.pigaddons.rpig.rutils.RException;
+import com.cwoodson.pigaddons.rpig.rutils.RUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.cwoodson.pigaddons.rutils;
+package com.cwoodson.pigaddons.rpig.rutils;
 
 public class RException extends Exception
 {

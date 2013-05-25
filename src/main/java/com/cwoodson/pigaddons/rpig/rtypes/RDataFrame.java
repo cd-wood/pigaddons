@@ -1,8 +1,8 @@
-package com.cwoodson.pigaddons.rtypes;
+package com.cwoodson.pigaddons.rpig.rtypes;
 
-import com.cwoodson.pigaddons.rutils.RConnector;
-import com.cwoodson.pigaddons.rutils.RException;
-import com.cwoodson.pigaddons.rutils.RHelpers;
+import com.cwoodson.pigaddons.rpig.rutils.RConnector;
+import com.cwoodson.pigaddons.rpig.rutils.RException;
+import com.cwoodson.pigaddons.rpig.rutils.RHelpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

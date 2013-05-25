@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cwoodson.pigaddons.rutils;
+package com.cwoodson.pigaddons.rpig.rutils;
 
-import com.cwoodson.pigaddons.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import java.io.InputStream;
 import java.util.List;
 

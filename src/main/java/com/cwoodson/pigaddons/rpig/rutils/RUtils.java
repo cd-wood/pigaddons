@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cwoodson.pigaddons.rutils;
+package com.cwoodson.pigaddons.rpig.rutils;
 
-import com.cwoodson.pigaddons.rtypes.RList;
-import com.cwoodson.pigaddons.rtypes.RPrimitive;
-import com.cwoodson.pigaddons.rtypes.RPrimitiveArray;
-import com.cwoodson.pigaddons.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rtypes.RList;
+import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
+import com.cwoodson.pigaddons.rpig.rtypes.RPrimitiveArray;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

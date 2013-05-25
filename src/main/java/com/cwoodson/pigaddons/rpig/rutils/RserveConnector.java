@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cwoodson.pigaddons.rutils;
+package com.cwoodson.pigaddons.rpig.rutils;
 
-import com.cwoodson.pigaddons.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -36,27 +36,27 @@ public class RserveConnector implements RConnector
     }
 
     @Override
-    public void terminate() throws com.cwoodson.pigaddons.rutils.RException {
+    public void terminate() throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String[] ls() throws com.cwoodson.pigaddons.rutils.RException {
+    public String[] ls() throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public RType eval(String expr) throws com.cwoodson.pigaddons.rutils.RException {
+    public RType eval(String expr) throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void voidEval(String expr) throws com.cwoodson.pigaddons.rutils.RException {
+    public void voidEval(String expr) throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void execFile(InputStream input, String path) throws com.cwoodson.pigaddons.rutils.RException {
+    public void execFile(InputStream input, String path) throws com.cwoodson.pigaddons.rpig.rutils.RException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

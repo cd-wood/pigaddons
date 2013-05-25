@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cwoodson.pigaddons.rutils;
+package com.cwoodson.pigaddons.rpig.rutils;
 
-import com.cwoodson.pigaddons.rtypes.RDataFrame;
-import com.cwoodson.pigaddons.rtypes.RList;
-import com.cwoodson.pigaddons.rtypes.RType;
-import com.cwoodson.pigaddons.rtypes.RPrimitive;
-import com.cwoodson.pigaddons.rtypes.RPrimitiveArray;
+import com.cwoodson.pigaddons.rpig.rtypes.RDataFrame;
+import com.cwoodson.pigaddons.rpig.rtypes.RList;
+import com.cwoodson.pigaddons.rpig.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
+import com.cwoodson.pigaddons.rpig.rtypes.RPrimitiveArray;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,9 +51,6 @@ public class RJriConnector implements RConnector
             
             try {
                 String[] args = {"--no-save", "--vanilla"};
-
-                //Set the property so that rJava does not make a System.exit(1)
-                //System.setProperty("jri.ignore.ule", "yes");
 
                 //jriLoaded is false is rJava did not find jri library
                 if (!Rengine.jriLoaded) {
