@@ -87,7 +87,6 @@ public class RJriConnector implements RConnector
             log.info("Null returned");
             return null;
         }
-        log.info("Converting : " + rexp.toString());
         int type = rexp.getType();
         RType result = null;
         switch (type) {
@@ -228,7 +227,6 @@ public class RJriConnector implements RConnector
                     rexp.toString());
                 break;
         }
-        log.info("Conversion complete: " + result.toString());
         return result;
     }
 
@@ -300,14 +298,13 @@ public class RJriConnector implements RConnector
         BufferedReader in = new BufferedReader(new InputStreamReader(scriptStream));
         log.info("Executing R File: " + path);
         try {
-            String line = null;
+            String line;
             String fullLine = "{\n";
             while((line = in.readLine()) != null)
             {
                 fullLine += line + '\n';
             }
             fullLine += "}";
-            log.info("Executing code: " + fullLine);
             voidEval(fullLine);
         } catch(IOException ioe) {
             log.error("Error while reading input stream", ioe);

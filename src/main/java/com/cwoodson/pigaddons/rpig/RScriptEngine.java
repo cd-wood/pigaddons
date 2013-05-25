@@ -122,18 +122,16 @@ public class RScriptEngine extends ScriptEngine
     public void registerFunctions(String path, String namespace, PigContext context) throws IOException {
         Interpreter.init(path, context);
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
-        log.info("Registering Functions in Namespace: " + namespace);
         for(String name : Interpreter.rEngine.lsFunctions())
         {
             if(!Interpreter.internalNames.contains(name))
             {
                 FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "('" + name + "')");
                 context.registerFunction(namespace + name, funcspec);
-                log.info("Registered Function: " + name);
+                log.info("Registered Function: " + namespace + name);
             }
         }
         context.addScriptFile(path);
-        log.info("Functions Registered");
     }
 
     @Override
@@ -165,7 +163,7 @@ public class RScriptEngine extends ScriptEngine
 
     @Override
     protected String getScriptingLang() {
-        return "rJava";
+        return "rPig";
     }
 
     @Override
@@ -196,6 +194,7 @@ public class RScriptEngine extends ScriptEngine
     
     private static class RShutdown extends Thread
     {
+        @Override
         public void run()
         {
             try {

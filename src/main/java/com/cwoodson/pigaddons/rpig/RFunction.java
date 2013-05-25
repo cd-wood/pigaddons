@@ -77,7 +77,7 @@ public class RFunction extends EvalFunc<Object> {
             }
             RType result = rEngine.eval(functionName + "(" + paramStr + ")");
             if(result instanceof RDataFrame) {
-                throw new UnsupportedOperationException("R-Pig does not currently support DataFrames");
+                throw new UnsupportedOperationException("rPig does not currently support DataFrames");
             } else if(!(result instanceof RList)) { // wrap any other RType
                 result_list = new RList(new String[] {outputSchema.getField(0).alias}, Arrays.asList(new Object[] {result}));
             } else {
