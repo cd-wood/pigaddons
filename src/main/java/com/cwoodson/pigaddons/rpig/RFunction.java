@@ -63,6 +63,8 @@ public class RFunction extends EvalFunc<Object> {
 
     @Override
     public Object exec(Tuple tuple) throws IOException {
+        getInputSchema();
+        
         if (inputSchema.size() == 1 && inputSchema.getField(0).type == DataType.TUPLE) {
             inputSchema = inputSchema.getField(0).schema;
         }
