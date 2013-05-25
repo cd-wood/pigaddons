@@ -28,7 +28,7 @@ PIG_CONF=${PIG_HOME}/conf/pig-env.sh
 
 if [ -f ${PIG_CONF} ]
 then
-  rm ${PIG_CONF}
+  rm -f ${PIG_CONF}
 fi
 
 echo "RPIG_JAR=\"${RPIG_JAR}\"" >> ${PIG_CONF}
