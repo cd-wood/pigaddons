@@ -42,13 +42,8 @@ public class RScriptEngine extends ScriptEngine
                     log.error("Rengine failed to be created. Exiting program.");
                     System.exit(1);
                 }
-                String rLibs = System.getProperty("rpig.libs");
-                if(rLibs == null || rLibs.isEmpty()) {
-                    rEngine.voidEval("install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org')");
-                } else {
-                    rEngine.voidEval(".libPaths('" + rLibs + "')");
-                }
-                rEngine.voidEval("library(rJava)");
+                rEngine.voidEval("if('rJava' %in% rownames(installed.packages()) == FALSE) { install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org') }");
+                rEngine.voidEval("library('rJava')");
                 rEngine.voidEval(".jinit()");
                 
                 // set up helpful functions

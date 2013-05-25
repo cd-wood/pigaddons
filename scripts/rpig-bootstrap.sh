@@ -23,5 +23,6 @@ R CMD INSTALL -l ${R_LIB_DIR} ${R_LIB_DIR}/rJava_0.9-4.tar.gz
 
 echo "export JRI_HOME=${JRI_HOME}" >> ${PIG_HOME}/conf/pig-env.sh
 echo "export R_HOME=${R_HOME}" >> ${PIG_HOME}/conf/pig-env.sh
-echo "export PIG_OPTS=\"\${PIG_OPTS} -Djava.library.path=\\\"\${JRI_HOME}:\${R_HOME}/bin\\\" -Drpig.libs=\\\"${R_LIB_DIR}\\\" -Drpig.gfx.width=640 -Drpig.gfx.height=480 -Drpig.gfx.ps=12\"" >> ${PIG_HOME}/conf/pig-env.sh
+echo "export R_LIBS_USER=\"${R_LIB_DIR}\"" >> ${PIG_HOME}/conf/pig-env.sh
+echo "export PIG_OPTS=\"\$PIG_OPTS -Drpig.gfx.width=640 -Drpig.gfx.height=480 -Drpig.gfx.ps=12\"" >> ${PIG_HOME}/conf/pig-env.sh
 echo "export LD_LIBRARY_PATH=\"\${LD_LIBRARY_PATH}:\${R_HOME}/bin:\${JRI_HOME}\"" >> ${PIG_HOME}/conf/pig-env.sh
