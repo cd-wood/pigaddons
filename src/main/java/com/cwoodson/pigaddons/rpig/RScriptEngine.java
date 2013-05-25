@@ -48,7 +48,7 @@ public class RScriptEngine extends ScriptEngine
                 } else {
                     rEngine.voidEval(".libPaths('" + rLibs + "')");
                 }
-                rEngine.voidEval("library('rJava')");
+                rEngine.voidEval("library(rJava)");
                 rEngine.voidEval(".jinit()");
                 
                 // set up helpful functions
