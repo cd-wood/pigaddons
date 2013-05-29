@@ -36,6 +36,7 @@ public class RUtils {
     }
 
     public static RList pigTupleToR(Tuple tuple, Schema schema, int depth) throws FrontendException, ExecException {
+        debugConvertPigToR(depth, "Tuple", tuple, schema);
         List<Object> data = new ArrayList<Object>(schema.size());
         List<String> names = new ArrayList<String>(schema.size());
         if (tuple != null) {
@@ -51,29 +52,39 @@ public class RUtils {
                 } else {
                     Object thing = tuple.get(i);
                     if (thing instanceof Object[]) {
+                        debugConvertPigToR(depth + 1, "array", thing, field.schema);
                         value = new RPrimitiveArray((Object[]) thing);
+                        debugReturn(depth + 1, value);
                     } else {
+                        debugConvertPigToR(depth + 1, "value", thing, field.schema);
                         value = new RPrimitive(thing);
+                        debugReturn(depth + 1, value);
                     }
                 }
                 data.add(value);
                 names.add(field.alias);
             }
         }
-        return new RList(names, data);
+        RList result = new RList(names, data);
+        debugReturn(depth, result);
+        return result;
     }
     
     public static RList pigMapToR(Map<String, Object> map, Schema schema, int depth) {
+        debugConvertPigToR(depth, "Map", map, schema);
         List<String> names = new ArrayList<String>(map.size());
         List<Object> data = new ArrayList<Object>(map.size());
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             names.add(entry.getKey());
             data.add(entry.getValue());
         }
-        return new RList(names, data);
+        RList result = new RList(names, data);
+        debugReturn(depth, result);
+        return result;
     }
 
     public static RList pigBagToR(DataBag bag, Schema schema, int depth) throws FrontendException, ExecException {
+        debugConvertPigToR(depth, "Bag", bag, schema);
         if (schema.size() == 1 && schema.getField(0).type == DataType.TUPLE) {
             schema = schema.getField(0).schema;
         }
@@ -93,12 +104,14 @@ public class RUtils {
             index++;
             data.add(pigTupleToR(t, schema, depth + 1));
         }
-        
-        return new RList(names, data);
+        RList result = new RList(names, data);
+        debugReturn(depth, result);
+        return result;
     }
 
     public static Tuple rToPigTuple(RList object, Schema schema, int depth) throws FrontendException, ExecException
     {
+        debugConvertRToPig(depth, "Tuple", object, schema);
         Tuple t = TupleFactory.getInstance().newTuple(schema.size());
         for(int i = 0; i < schema.size(); i++)
         {
@@ -139,10 +152,12 @@ public class RUtils {
                 logger.warn("RList does not contain name specified by schema: " + field.alias + " [" + object.toRString() + "]");
             }
         }
+        debugReturn(depth, t);
         return t;
     }
     
     private static DataBag rToPigBag(RList object, Schema schema, int depth) throws FrontendException, ExecException {
+        debugConvertRToPig(depth, "Bag", object, schema);
         if(schema.size() == 1 && schema.getField(0).type == DataType.TUPLE) {
             schema = schema.getField(0).schema;
         }
@@ -157,10 +172,12 @@ public class RUtils {
             }
         }
         DataBag result = BagFactory.getInstance().newDefaultBag(bag);
+        debugReturn(depth, result);
         return result;
     }
     
     private static Map<String, Object> rToPigMap(RList object, Schema schema, int depth) {
+        debugConvertRToPig(depth, "Map", object, schema);
         Map<String, Object> map = new HashMap<String, Object>();
         List<String> names = object.getNames();
         for(int i = 0; i < names.size(); i++) {
@@ -169,6 +186,62 @@ public class RUtils {
                 map.put(names.get(i), data);
             }
         }
+        debugReturn(depth, map);
         return map;
+    }
+    
+    /* Debug Logging Functions adapted from org.apache.pig.scripting.js.JsFunction */
+    private static void debugConvertPigToR(int depth, String pigType, Object value, Schema schema) {
+        if(logger.isDebugEnabled()) {
+            logger.debug(indent(depth) + "converting from Pig " + pigType + " " + value + " using " + stringify(schema));
+        }
+    }
+    
+    private static void debugConvertRToPig(int depth, String pigType, RType rValue, Schema schema) {
+        if(logger.isDebugEnabled()) {
+            logger.debug(indent(depth) + "converting to Pig " + pigType + " " + rValue.toRString() + " using " + stringify(schema));
+        }
+    }
+    
+    private static void debugReturn(int depth, Object value) {
+        if(logger.isDebugEnabled()) {
+            String valStr = (value instanceof RType) ? ((RType)value).toRString() : value.toString();
+            logger.debug(indent(depth) + "returning " + valStr);
+        }
+    }
+    
+    /* Debug Utility Functions taken from org.apache.pig.scripting.js.JsFunction */
+    public static String indent(int depth) {
+        StringBuilder b = new StringBuilder(depth * 2);
+        for(int i = 0; i < depth*2; i++) {
+            b.append(' ');
+        }
+        return b.toString();
+    }
+    
+    public static String stringify(Schema schema) {
+        StringBuilder builder = new StringBuilder();
+        stringify(schema, builder);
+        return builder.toString();
+    }
+    
+    private static void stringify(Schema schema, StringBuilder builder) {
+        if(schema != null) {
+            builder.append("( ");
+            List<FieldSchema> fields = schema.getFields();
+            for(int i = 0; i < fields.size(); i++) {
+                FieldSchema fs = fields.get(i);
+                if(i != 0) {
+                    builder.append(", ");
+                }
+                builder
+                        .append(DataType.findTypeName(fs.type))
+                        .append(": ")
+                        .append(fs.alias)
+                        .append(" ");
+                stringify(fs.schema, builder);
+            }
+            builder.append(" )");
+        }
     }
 }
