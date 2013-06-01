@@ -37,13 +37,16 @@ public class RList extends RType
      * @throws org.nuiton.j2r.RException if an error occur while initializing
      * the list in R.
      */
-    public RList(List<String> names, List<Object> data)
+    public RList(List<String> names, List<Object> data) throws RException
     {
+        if(names.size() != data.size()) {
+            throw new RException("RList created with mismatched name/data lists");
+        }
         this.names = names;
         this.data = data;
     }
     
-    public RList(String[] asStringArray, List<Object> data2) {
+    public RList(String[] asStringArray, List<Object> data2) throws RException {
     	this(Arrays.asList(asStringArray), data2);
 	}
 
