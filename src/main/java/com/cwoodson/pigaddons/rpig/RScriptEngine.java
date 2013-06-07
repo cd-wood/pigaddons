@@ -32,6 +32,7 @@ public class RScriptEngine extends ScriptEngine
     {
         static final RConnector rEngine;
         static final Set<String> internalNames = new HashSet<String>();
+        static final Set<String> registeredFuncs = new HashSet<String>();
         static
         {
             Runtime.getRuntime().addShutdownHook(new RShutdown());
@@ -129,8 +130,13 @@ public class RScriptEngine extends ScriptEngine
         {
             if(!Interpreter.internalNames.contains(name))
             {
+                if(Interpreter.registeredFuncs.contains(name)) {
+                    log.warn("R Function " + name + " has already been registered");
+                    continue;
+                }
                 FuncSpec funcspec = new FuncSpec(RFunction.class.getCanonicalName() + "('" + name + "')");
                 context.registerFunction(namespace + name, funcspec);
+                Interpreter.registeredFuncs.add(name);
                 log.info("Registered Function: " + namespace + name);
             }
         }
