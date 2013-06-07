@@ -35,7 +35,7 @@ public class RUtils {
     private RUtils() {
     }
 
-    public static RList pigTupleToR(Tuple tuple, Schema schema, int depth) throws FrontendException, ExecException {
+    public static RList pigTupleToR(Tuple tuple, Schema schema, int depth) throws RException, FrontendException, ExecException {
         debugConvertPigToR(depth, "Tuple", tuple, schema);
         List<Object> data = new ArrayList<Object>(schema.size());
         List<String> names = new ArrayList<String>(schema.size());
@@ -70,7 +70,7 @@ public class RUtils {
         return result;
     }
     
-    public static RList pigMapToR(Map<String, Object> map, Schema schema, int depth) {
+    public static RList pigMapToR(Map<String, Object> map, Schema schema, int depth) throws RException {
         debugConvertPigToR(depth, "Map", map, schema);
         List<String> names = new ArrayList<String>(map.size());
         List<Object> data = new ArrayList<Object>(map.size());
@@ -83,7 +83,7 @@ public class RUtils {
         return result;
     }
 
-    public static RList pigBagToR(DataBag bag, Schema schema, int depth) throws FrontendException, ExecException {
+    public static RPrimitiveArray pigBagToR(DataBag bag, Schema schema, int depth) throws RException, FrontendException, ExecException {
         debugConvertPigToR(depth, "Bag", bag, schema);
         if (schema.size() == 1 && schema.getField(0).type == DataType.TUPLE) {
             schema = schema.getField(0).schema;
@@ -95,16 +95,14 @@ public class RUtils {
 
         Integer bagSize = Integer.valueOf(Long.toString(bag.size()));
 
-        List<String> names = new ArrayList<String>(bagSize);
-        List<Object> data = new ArrayList<Object>(bagSize);
-
+        RList[] data = new RList[bagSize];
+        
         int index = 0;
         for (Tuple t : bag) {
-            names.add(Integer.toString(index));
+            data[index] = pigTupleToR(t, schema, depth + 1);
             index++;
-            data.add(pigTupleToR(t, schema, depth + 1));
         }
-        RList result = new RList(names, data);
+        RPrimitiveArray result = new RPrimitiveArray(data);
         debugReturn(depth, result);
         return result;
     }

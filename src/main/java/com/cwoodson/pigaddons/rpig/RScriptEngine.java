@@ -47,8 +47,8 @@ public class RScriptEngine extends ScriptEngine
                 rEngine.voidEval(".jinit()");
                 
                 // set up helpful functions
-                //rEngine.voidEval("Utils.logError <<- function(error) {.jcall('com/cwoodson/pigaddons/rfunctions/Utils', 'LogError', error) }");
-                //rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
+                rEngine.voidEval("Utils.logError <<- function(error) {.jcall('com/cwoodson/pigaddons/rfunctions/Utils', 'LogError', error) }");
+                rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
                 
                 // set up JavaGD
                 //rEngine.voidEval("Sys.setenv('JAVAGD_USE_RJAVA'=TRUE)");
