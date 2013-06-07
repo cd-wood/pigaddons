@@ -1,20 +1,16 @@
 REGISTER 'naive-bayes.r' using com.cwoodson.pigaddons.rpig.RScriptEngine as rfuncs;
 
-test_data0 = LOAD 'naive-bayes.data.test';
+test_data = LOAD 'naive-bayes.data.test' AS test_result:int, a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int, i:int, j:int, k:int, l:int, m:int, n:int, o:int, p:int;
 
-test_data1 = FOREACH test_data0 GENERATE $0 AS test_result:int, TOTUPLE($1 ..) AS fields;
+test_spam = FILTER test_data BY test_result == 1;
+test_spam1 = GROUP test_spam ALL;
+test_nospam = FILTER test_data BY test_result == 0;
+test_nospam1 = GROUP test_nospam ALL;
 
-test_spam = FILTER test_data1 BY test_result == 1;
-test_spam1 = FOREACH test_spam GENERATE fields;
-test_spam2 = GROUP test_spam1 ALL;
-test_nospam = FILTER test_data1 BY test_result == 0;
-test_nospam1 = FOREACH test_nospam GENERATE fields;
-test_nospam2 = GROUP test_nospam1 ALL;
+test_spam_cnt = FOREACH test_spam1 GENERATE SUM(test_spam.a), SUM(test_spam.b), SUM(test_spam.c), SUM(test_spam.d), SUM(test_spam.e), SUM(test_spam.f) , SUM(test_spam.g), SUM(test_spam.h), SUM(test_spam.i), SUM(test_spam.j), SUM(test_spam.k), SUM(test_spam.l), SUM(test_spam.m), SUM(test_spam.n), SUM(test_spam.o), SUM(test_spam.p), COUNT(test_spam);
+test_nospam_cnt = FOREACH test_nospam1 GENERATE SUM(test_nospam.a), SUM(test_nospam.b), SUM(test_nospam.c), SUM(test_nospam.d), SUM(test_nospam.e), SUM(test_nospam.f), SUM(test_nospam.g), SUM(test_nospam.h), SUM(test_nospam.i), SUM(test_nospam.j), SUM(test_nospam.k), SUM(test_nospam.l), SUM(test_nospam.m), SUM(test_nospam.n), SUM(test_nospam.o), SUM(test_nospam.p), COUNT(test_nospam);
 
-test_spam_cnt = FOREACH test_spam3 GENERATE SUM(test_spam1.$0), SUM(test_spam1.$1), SUM(test_spam1.$2), SUM(test_spam1.$3), SUM(test_spam1.$4), SUM(test_spam1.$5) , SUM(test_spam1.$6), SUM(test_spam1.$7), SUM(test_spam1.$8), SUM(test_spam1.$9), SUM(test_spam1.$10), SUM(test_spam1.$11), SUM(test_spam1.$12), SUM(test_spam1.$13), SUM(test_spam1.$14), SUM(test_spam1.$15), COUNT(test_spam);
-test_nospam_cnt = FOREACH test_nospam2 GENERATE SUM(test_nospam1.$0), SUM(test_nospam1.$1), SUM(test_nospam1.$2), SUM(test_nospam1.$3), SUM(test_nospam1.$4), SUM(test_nospam1.$5), SUM(test_nospam1.$6), SUM(test_nospam1.$7), SUM(test_nospam1.$8), SUM(test_nospam1.$9), SUM(test_nospam1.$10), SUM(test_nospam1.$11), SUM(test_nospam1.$12), SUM(test_nospam1.$13), SUM(test_nospam1.$14), SUM(test_nospam1.$15), COUNT(test_nospam);
-
-real_data = LOAD 'naive-bayes.data';
+real_data = LOAD 'naive-bayes.data' AS a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int, i:int, j:int, k:int, l:int, m:int, n:int, o:int, p:int;
 
 output = FOREACH real_data { fields = TOTUPLE($0 ..); } GENERATE rfuncs.CalcProb(fields, test_spam_cnt, test_nospam_cnt) as prob:(spam:int, pnotspam:double, pisspam:double);
 
