@@ -30,13 +30,13 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     tot <- num_spam + num_notspam
 
     CalcProb.make_tables <- function(n) {
-        return(c(c(1 + notspam_test_data[[n]], 1 + num_notspam - notspam_test_data[[n]]), c(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
+        return(list(c(1 + notspam_test_data[[n]], 1 + num_notspam - notspam_test_data[[n]]), c(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
     }
     
     tables <- lapply(1:list_length, CalcProb.make_tables);
 
     CalcProb.make_probs <- function(n) {
-        return(lapply(1:2, function(x) lapply(1:2, function(y) tables[[n]][x][y] / (num_spam + num_notspam))))
+        return(lapply(1:2, function(x) lapply(1:2, function(y) tables[[n]][[x]][[y]] / (tot + 4))))
     }
     
     probs <- lapply(1:list_length, CalcProb.make_probs);
@@ -45,8 +45,8 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
 
     CalcProb.inner <- function(n) {
         col <- fields[[n]] + 1
-        result[[2]] <- result[[2]] + log(probs[[n]][1][col])
-        result[[3]] <- result[[3]] + log(probs[[n]][2][col])
+        result[[2]] <- result[[2]] + log(probs[[n]][[1]][[col]])
+        result[[3]] <- result[[3]] + log(probs[[n]][[2]][[col]])
     }
 
     lapply(1:list_length, CalcProb.inner)
@@ -59,4 +59,4 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     }
     return(result)
 }
-attributes(CalcProb)$outputSchema <- 'probabilities:(spam:int, pnotspam:double, pspam:double)'
+attributes(CalcProb)$outputSchema <- 'probabilities:(isspam:int, pnotspam:double, pspam:double)'
