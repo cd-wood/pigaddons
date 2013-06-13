@@ -13,11 +13,9 @@ import com.cwoodson.pigaddons.rpig.rutils.RException;
 import com.cwoodson.pigaddons.rpig.rutils.RUtils;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.apache.pig.EvalFunc;
-import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
@@ -72,7 +70,7 @@ public class RFunction extends EvalFunc<Object> {
             List<RType> params = RUtils.pigTupleToR(tuple, inputSchema, 0).expand();
             String paramStr = params.isEmpty() ? "" : params.get(0).toRString();
             for(int i = 1; i < params.size(); i++) {
-                paramStr += ", " + params.get(i);
+                paramStr += ", " + params.get(i).toRString();
             }
             RType result = rEngine.eval(functionName + "(" + paramStr + ")");
             if(result instanceof RDataFrame) {
