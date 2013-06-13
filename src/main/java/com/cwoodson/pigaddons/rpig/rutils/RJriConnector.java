@@ -202,17 +202,14 @@ public class RJriConnector implements RConnector
                         rexp.getAttribute("row.names").asStringArray(),
                         data);
                     result = temp;
-                } else if (list != null) {
+                } else if (list != null && list.keys() != null) {
                     List<Object> data = new ArrayList<Object>();
-                    org.rosuda.JRI.RList dataList = rexp.asList();
-                    for (int i = 0; i < dataList.keys().length; i++) {
+                    for (int i = 0; i < list.keys().length; i++) {
                         //for each object of the list, convert it to java.
-                        REXP tempREXP = dataList.at(i);
-                        Object convertedREXP = convertResult(
-                            tempREXP);
+                        REXP tempREXP = list.at(i);
+                        Object convertedREXP = convertResult(tempREXP);
                         //add this object to the data list.
                         data.add(convertedREXP);
-
                     }
                     result = new RList(
                         rexp.getAttribute("names").asStringArray(),
