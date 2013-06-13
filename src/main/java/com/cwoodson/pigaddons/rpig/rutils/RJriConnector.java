@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
@@ -270,6 +271,7 @@ public class RJriConnector implements RConnector
         String call = RHelpers.safeCall(expr);
         log.info(call);
         REXP r = engine.eval(call);
+        log.info(r.toString());
         if (r != null && RHelpers.isError(r)) {
             throw new RException(r.asString());
         }
