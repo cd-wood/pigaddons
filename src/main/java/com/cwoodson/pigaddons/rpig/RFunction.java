@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.pig.EvalFunc;
+import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
@@ -84,8 +85,13 @@ public class RFunction extends EvalFunc<Object> {
             throw new IOException("R Function Execution failed", ex);
         }
         
-        Tuple evalTuple = RUtils.rToPigTuple(result_list, outputSchema, 0);
-        Object eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple;
+        Schema out = outputSchema;
+        if(out.size() == 1 && out.getField(0).type == DataType.TUPLE) {
+            out = out.getField(0).schema;
+        }
+        
+        Tuple evalTuple = RUtils.rToPigTuple(result_list, out, 0);
+        Object eval = out.size() == 1 ? evalTuple.get(0) : evalTuple;
         return eval;
     }
 
