@@ -4,10 +4,12 @@
  */
 package com.cwoodson.pigaddons.rpig;
 
+import com.cwoodson.pigaddons.rpig.rfunctions.Utils;
 import com.cwoodson.pigaddons.rpig.rutils.RConnector;
 import com.cwoodson.pigaddons.rpig.rutils.RException;
 import com.cwoodson.pigaddons.rpig.rutils.RJriConnector;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -46,9 +48,10 @@ public class RScriptEngine extends ScriptEngine
                 rEngine.voidEval("if('rJava' %in% rownames(installed.packages()) == FALSE) { install.packages('rJava', dependencies=TRUE, repos='http://cran.us.r-project.org') }");
                 rEngine.voidEval("library('rJava')");
                 rEngine.voidEval(".jinit()");
+                rEngine.voidEval(".jaddClassPath('" + getJarPath(Utils.class) + "')");
                 
                 // set up helpful functions
-                rEngine.voidEval("Utils.logError <<- function(error) {.jcall('com/cwoodson/pigaddons/rfunctions/Utils', 'LogError', error) }");
+                rEngine.voidEval("Utils.logError <<- function(error) { .jcall('com/cwoodson/pigaddons/rfunctions/Utils', 'LogError', error) }");
                 rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
                 
                 internalNames.add("Utils.logError");
@@ -97,6 +100,9 @@ public class RScriptEngine extends ScriptEngine
             } catch(RException re) {
                 log.error("RException thrown", re);
                 throw new RuntimeException("Unable to initialize R", re);
+            } catch(FileNotFoundException fnfe) {
+                log.error("FileNotFoundException thrown", fnfe);
+                throw new RuntimeException("Unable to initialize RScriptEngine", fnfe);
             }
         }
         

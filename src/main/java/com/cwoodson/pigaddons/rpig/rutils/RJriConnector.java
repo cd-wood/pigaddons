@@ -259,7 +259,6 @@ public class RJriConnector implements RConnector
 
         //encapsulate the R expression in a try method/object to get the R error
         //message if thrown
-        System.loadLibrary("jri");
         String call = RHelpers.safeCall(expr);
         log.info(call);
         REXP r = engine.eval(call);
