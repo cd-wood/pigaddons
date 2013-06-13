@@ -203,7 +203,10 @@ public class RJriConnector implements RConnector
                         rexp.getAttribute("row.names").asStringArray(),
                         data);
                     result = temp;
-                } else if (list != null && list.keys() != null) {
+                } else if (list != null) {
+                    if(list.keys() == null) { // Empty list?
+                        return new RList();
+                    }
                     List<Object> data = new ArrayList<Object>();
                     for (int i = 0; i < list.keys().length; i++) {
                         //for each object of the list, convert it to java.
@@ -281,6 +284,9 @@ public class RJriConnector implements RConnector
     private RList vectorToList(RVector vec) throws RException
     {
         List<String> names = vec.getNames();
+        if(names == null) { // empty vector?
+            return new RList();
+        }
         List<Object> data = new ArrayList<Object>(names.size());
         for(String name : names)
         {
