@@ -274,7 +274,6 @@ public class RJriConnector implements RConnector
         String call = RHelpers.safeCall(expr);
         log.info(call);
         REXP r = engine.eval(call);
-        log.info(r.toString());
         if (r != null && RHelpers.isError(r)) {
             throw new RException(r.asString());
         }
