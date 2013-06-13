@@ -170,56 +170,12 @@ public class RJriConnector implements RConnector
                 //dataframes, lists and vectors are recognized as vectors.
                 
                 //get REXP asList to successfully detect lists.
-                org.rosuda.JRI.RList list = rexp.asList();
                 if (RHelpers.isDataframe(rexp)) {
-
-                    //if rexp is a data.frame
-                    RDataFrame temp;
-
-                    //create the data list.
-                    List<List<? extends Object>> data =
-                        new ArrayList<List<? extends Object>>();
-                    //get rexp as a list (data.frame is a list of vectors)
-                    org.rosuda.JRI.RList dataList = rexp.asList();
-                    for (int i = 0; i < dataList.keys().length; i++) {
-                        //for each vector, create a list and fill it with the
-                        //content of the vector.
-                        REXP tempREXP = dataList.at(i);
-                        RType convertedREXP = convertResult(tempREXP);
-                        List<Object> templist = convertedREXP.asList();
-                        if(templist == null) {
-                            log.error("Failed to convert rexp to RList while building dataframe: " + tempREXP.asString());
-                            templist = new ArrayList<Object>();
-                        }
-                        //add this list to the data list.
-                        data.add(templist);
-
-                    }
-                    //Create a new dataframe with the names, row.names and data
-                    //gotten from rexp. It has no variable name so throws a
-                    //RException.
-                    temp = new RDataFrame(rexp.getAttribute(
-                        "names").asStringArray(),
-                        rexp.getAttribute("row.names").asStringArray(),
-                        data);
-                    result = temp;
-                } else if (list != null) {
-                    if(list.keys() == null) { // Empty list?
-                        return new RList();
-                    }
-                    List<Object> data = new ArrayList<Object>();
-                    for (int i = 0; i < list.keys().length; i++) {
-                        //for each object of the list, convert it to java.
-                        REXP tempREXP = list.at(i);
-                        Object convertedREXP = convertResult(tempREXP);
-                        //add this object to the data list.
-                        data.add(convertedREXP);
-                    }
-                    result = new RList(
-                        rexp.getAttribute("names").asStringArray(),
-                        data);
+                    convertDataFrame(rexp);
+                } else if (rexp.asList() != null) {
+                    return convertList(rexp);
                 } else {
-                    return vectorToList(rexp.asVector());
+                    return convertVector(rexp.asVector());
                 }
                 break;
             default:
@@ -280,20 +236,49 @@ public class RJriConnector implements RConnector
         return convertResult(r);
     }
     
-    private RList vectorToList(RVector vec) throws RException
+    private RDataFrame convertDataFrame(REXP rexp) throws RException {
+        throw new RException("Data Frames are not currently supported");
+    }
+    
+    private RList convertList(REXP rexp) throws RException {
+        org.rosuda.JRI.RList list = rexp.asList();
+        
+        List<Object> data = new ArrayList<Object>();
+        String[] names = {};
+        
+        REXP attrNames = RHelpers.getNamesAttribute(rexp);
+        if(attrNames != null) {
+            names = attrNames.asStringArray();
+        }
+        
+        Boolean flag = true;
+        int index = 0;
+        
+        while(flag) {
+            REXP tempREXP = list.at(index);
+            if(tempREXP == null) {
+                flag = false;
+            } else {
+                Object converted = convertResult(tempREXP);
+                data.add(converted);
+                index++;
+            }
+        }
+        
+        return new RList(names, data);
+    }
+    
+    private RList convertVector(RVector vec) throws RException
     {
-        List<String> names = vec.getNames();
-        if(names == null) { // empty vector?
-            return new RList();
+        List<Object> data = new ArrayList<Object>();
+        for(Object o : vec) {
+            data.add(convertResult((REXP)o));
         }
-        List<Object> data = new ArrayList<Object>(names.size());
-        for(String name : names)
-        {
-            REXP rVal = vec.at(name);
-            data.add(convertResult(rVal));
+        List<String> names = new ArrayList<String>(0);
+        if(!vec.getNames().isEmpty()) {
+            names = vec.getNames();
         }
-        RList list = new RList(names, data);
-        return list;
+        return new RList(names, data);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class RList extends RType
      */
     public RList(List<String> names, List<Object> data) throws RException
     {
-        if(names.size() != data.size()) {
+        if(!names.isEmpty() && names.size() != data.size()) {
             throw new RException("RList created with mismatched name/data lists");
         }
         this.names = names;

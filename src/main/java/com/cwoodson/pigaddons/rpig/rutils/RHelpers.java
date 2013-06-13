@@ -42,6 +42,10 @@ public class RHelpers
         public static boolean isError(REXP rexp) {
             return isError(getClass(rexp));
         }
+        
+        public static REXP getNamesAttribute(REXP rexp) {
+            return rexp.getAttribute("names");
+        }
 	
 	public static final String TRUE = "TRUE";
 	public static final String FALSE = "FALSE";
