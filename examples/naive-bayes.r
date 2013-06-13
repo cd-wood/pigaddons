@@ -16,11 +16,11 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
         Utils.logError('Param 1 to CalcProb has length <= 0')
         return(NULL)
     }
-    if(length(spam_test_data) + 1 != length(list_length)) {
+    if(length(spam_test_data) != list_length + 1) {
         Utils.logError('Param 2 to CalcProb has incorrect length')
         return(NULL)
     }
-    if(length(notspam_test_data) + 1 != list_length) {
+    if(length(notspam_test_data) != list_length + 1) {
         Utils.logError('Param 3 to CalcProb has incorrect length')
         return(NULL)
     }

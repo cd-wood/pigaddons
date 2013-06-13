@@ -15,7 +15,11 @@ public class Utils {
     private static Logger log = LoggerFactory.getLogger(Utils.class);
     private Utils() {}
     
-    public static void LogError(String error) {
+    public void LogInfo(String info) {
+        log.info(info);
+    }
+    
+    public void LogError(String error) {
         log.error(error);
     }
 }
