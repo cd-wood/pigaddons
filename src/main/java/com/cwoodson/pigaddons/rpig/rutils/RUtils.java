@@ -191,20 +191,20 @@ public class RUtils {
     /* Debug Logging Functions adapted from org.apache.pig.scripting.js.JsFunction */
     private static void debugConvertPigToR(int depth, String pigType, Object value, Schema schema) {
         //if(logger.isDebugEnabled()) {
-            logger.debug(indent(depth) + "converting from Pig " + pigType + " " + value + " using " + stringify(schema));
+            logger.info(indent(depth) + "converting from Pig " + pigType + " " + value + " using " + stringify(schema));
         //}
     }
     
     private static void debugConvertRToPig(int depth, String pigType, RType rValue, Schema schema) {
         //if(logger.isDebugEnabled()) {
-            logger.debug(indent(depth) + "converting to Pig " + pigType + " " + rValue.toRString() + " using " + stringify(schema));
+            logger.info(indent(depth) + "converting to Pig " + pigType + " " + rValue.toRString() + " using " + stringify(schema));
         //}
     }
     
     private static void debugReturn(int depth, Object value) {
         //if(logger.isDebugEnabled()) {
             String valStr = (value instanceof RType) ? ((RType)value).toRString() : value.toString();
-            logger.debug(indent(depth) + "returning " + valStr);
+            logger.info(indent(depth) + "returning " + valStr);
         //}
     }
     

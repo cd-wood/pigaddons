@@ -18,6 +18,6 @@ test_data_joined = JOIN test_spam_cnt BY join_key, test_notspam_cnt BY join_key;
 
 real_data_joined = JOIN real_data_aux BY join_key LEFT, test_data_joined BY test_spam_cnt::join_key;
 
-result = FOREACH real_data GENERATE rfuncs.CalcProb(real_data_aux::fields, test_spam_cnt::data, test_notspam_cnt.data) as prob:(spam:int, pnotspam:double, pisspam:double);
+result = FOREACH real_data { flds = real_data_aux::fields; spam = test_spam_cnt::data; notspam = test_notspam_cnt::data; GENERATE rfuncs.CalcProb(flds, spam, notspam) as prob:(spam:int, pnotspam:double, pisspam:double); }
 
 STORE result INTO 'output/naive-bayes';
