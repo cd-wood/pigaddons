@@ -45,20 +45,21 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
 
     Utils.logInfo(paste('probs: ', toString(probs)))
 
-    result <- list(0, 0.0, 0.0)
+    result <- list(isspam=0, pnotspam=0.0, pspam=0.0)
 
-    CalcProb.inner <- function(var) {
-        result[[2]] <<- result[[2]] + log(probs[[n]][[1]][[var + 1]])
-        result[[3]] <<- result[[3]] + log(probs[[n]][[2]][[var + 1]])
+    CalcProb.inner <- function(n) {
+        col <- fields[[n]] + 1
+        result[[2]] <<- result[[2]] + log(probs[[n]][[1]][[col]])
+        result[[3]] <<- result[[3]] + log(probs[[n]][[2]][[col]])
     }
 
-    lapply(fields, CalcProb.inner)
+    lapply(1:list_length, CalcProb.inner)
     
-    result[[2]] <- result[[2]] - (log((num_notspam + 1) / tot) * (list_length - 1))
-    result[[3]] <- result[[3]] - (log((num_spam + 1) / tot) * (list_length - 1))
+    result$pnotspam <- result$pnotspam - (log((num_notspam + 1) / tot) * (list_length - 1))
+    result$pspam <- result$pspam - (log((num_spam + 1) / tot) * (list_length - 1))
 
-    if(result[[3]] > result[[2]]) {
-        result[[1]] <- 1
+    if(result$pspam > result$pnotspam) {
+        result$isspam <- 1
     }
     return(result)
 }
