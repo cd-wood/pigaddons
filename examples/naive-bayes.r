@@ -31,24 +31,23 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     num_notspam <- notspam_test_data[[list_length + 1]]
     tot <- num_spam + num_notspam
 
-    /* Makes a Naive Bayes table representing the following:
-    
-       |  0  |  1  |
-      -|-----|-----|
-      0|  a  |  b  |
-      -|-----|-----|
-      1|  c  |  d  |
-      -|-----|-----|
-
-      a: Number of times variable was 0 and event was 0 (not spam)
-      b: Number of times variable was 1 and event was 0
-      c: Number of times variable was 0 and event was 1 (spam)
-      d: Number of times variable was 1 and event was 1
-
-      Note that notspam_test_data contains the values for b
-      and spam_test_data contains the values for d
-      We add 1 in all cases because of LaPlace
-    */
+    # Makes a Naive Bayes table representing the following:
+    #
+    #  |  0  |  1  |
+    # -|-----|-----|
+    # 0|  a  |  b  |
+    # -|-----|-----|
+    # 1|  c  |  d  |
+    # -|-----|-----|
+    #
+    # a: Number of times variable was 0 and event was 0 (not spam)
+    # b: Number of times variable was 1 and event was 0
+    # c: Number of times variable was 0 and event was 1 (spam)
+    # d: Number of times variable was 1 and event was 1
+    #
+    # Note that notspam_test_data contains the values for b
+    # and spam_test_data contains the values for d
+    # We add 1 in all cases because of LaPlace
     CalcProb.make_tables <- function(n) {
         return(list(list(1 + num_notspam - notspam_test_data[[n]], 1 + notspam_test_data[[n]]), list(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
     }
