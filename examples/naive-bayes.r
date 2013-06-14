@@ -30,7 +30,7 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     tot <- num_spam + num_notspam
 
     CalcProb.make_tables <- function(n) {
-        return(list(c(1 + num_notspam - notspam_test_data[[n]], 1 + notspam_test_data[[n]]), c(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
+        return(list(list(1 + notspam_test_data[[n]], 1 + num_notspam - notspam_test_data[[n]]), list(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
     }
     
     tables <- lapply(1:list_length, CalcProb.make_tables)
