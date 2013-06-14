@@ -54,8 +54,6 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     
     tables <- lapply(1:list_length, CalcProb.make_tables)
 
-    Utils.logInfo(paste('tables: ', toString(tables)))
-
     # Simple probability, divide each cell by total number of events
     # +4 is because of LaPlace
     CalcProb.make_probs <- function(n) {
@@ -63,8 +61,6 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     }
     
     probs <- lapply(1:list_length, CalcProb.make_probs)
-
-    Utils.logInfo(paste('probs: ', toString(probs)))
 
     # Our resulting list must have names.
     # The names are more important than the order, as the
