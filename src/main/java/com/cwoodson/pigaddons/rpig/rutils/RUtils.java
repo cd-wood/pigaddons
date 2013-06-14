@@ -1,6 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 Connor Woodson
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.cwoodson.pigaddons.rpig.rutils;
 
@@ -31,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class RUtils {
 
     private static Logger logger = LoggerFactory.getLogger(RUtils.class);
-    
+
     private RUtils() {
     }
 
@@ -69,7 +88,7 @@ public class RUtils {
         debugReturn(depth, result);
         return result;
     }
-    
+
     public static RList pigMapToR(Map<String, Object> map, Schema schema, int depth) throws RException {
         debugConvertPigToR(depth, "Map", map, schema);
         List<String> names = new ArrayList<String>(map.size());
@@ -96,7 +115,7 @@ public class RUtils {
         Integer bagSize = Integer.valueOf(Long.toString(bag.size()));
 
         RList[] data = new RList[bagSize];
-        
+
         int index = 0;
         for (Tuple t : bag) {
             data[index] = pigTupleToR(t, schema, depth + 1);
@@ -107,41 +126,38 @@ public class RUtils {
         return result;
     }
 
-    public static Tuple rToPigTuple(RList object, Schema schema, int depth) throws FrontendException, ExecException
-    {
+    public static Tuple rToPigTuple(RList object, Schema schema, int depth) throws FrontendException, ExecException {
         debugConvertRToPig(depth, "Tuple", object, schema);
         Tuple t = TupleFactory.getInstance().newTuple(schema.size());
-        for(int i = 0; i < schema.size(); i++)
-        {
+        for (int i = 0; i < schema.size(); i++) {
             FieldSchema field = schema.getField(i);
             int index = object.contains(field.alias);
             Object data = null;
-            if((index >= 0) && ((data = object.get(index)) != null)) {
+            if ((index >= 0) && ((data = object.get(index)) != null)) {
                 byte type = field.type;
                 Object value;
-                if(type == DataType.BAG)
-                {
-                    if(data instanceof RList) {
-                        value = rToPigBag((RList)data, field.schema, depth + 1);
+                if (type == DataType.BAG) {
+                    if (data instanceof RList) {
+                        value = rToPigBag((RList) data, field.schema, depth + 1);
                     } else {
                         value = null;
                     }
-                } else if(field.type == DataType.TUPLE) {
-                    if(data instanceof RList) {
-                        value = rToPigTuple((RList)data, field.schema, depth + 1);
+                } else if (field.type == DataType.TUPLE) {
+                    if (data instanceof RList) {
+                        value = rToPigTuple((RList) data, field.schema, depth + 1);
                     } else {
                         value = null;
                     }
-                } else if(field.type == DataType.MAP) {
-                    if(data instanceof RList) {
-                        value = rToPigMap((RList)data, field.schema, depth + 1);
+                } else if (field.type == DataType.MAP) {
+                    if (data instanceof RList) {
+                        value = rToPigMap((RList) data, field.schema, depth + 1);
                     } else {
                         value = null;
                     }
-                } else if(data instanceof RPrimitive) {
-                    value = ((RPrimitive)data).getValue();
-                } else if(data instanceof RPrimitiveArray) {
-                    value = ((RPrimitiveArray)data).getArray();
+                } else if (data instanceof RPrimitive) {
+                    value = ((RPrimitive) data).getValue();
+                } else if (data instanceof RPrimitiveArray) {
+                    value = ((RPrimitiveArray) data).getArray();
                 } else {
                     value = data;
                 }
@@ -153,18 +169,18 @@ public class RUtils {
         debugReturn(depth, t);
         return t;
     }
-    
+
     private static DataBag rToPigBag(RList object, Schema schema, int depth) throws FrontendException, ExecException {
         debugConvertRToPig(depth, "Bag", object, schema);
-        if(schema.size() == 1 && schema.getField(0).type == DataType.TUPLE) {
+        if (schema.size() == 1 && schema.getField(0).type == DataType.TUPLE) {
             schema = schema.getField(0).schema;
         }
         List<Tuple> bag = new ArrayList<Tuple>();
         List<Object> data = object.asList();
-        for(int i = 0; i < data.size(); i ++) {
+        for (int i = 0; i < data.size(); i++) {
             Object obj = data.get(i);
-            if(obj instanceof RList) {
-                bag.add(rToPigTuple((RList)obj, schema, depth + 1));
+            if (obj instanceof RList) {
+                bag.add(rToPigTuple((RList) obj, schema, depth + 1));
             } else {
                 logger.warn("Interpreted RList as a DataBag, but list does contains something other than an RList {" + object.toRString() + "}");
             }
@@ -173,57 +189,57 @@ public class RUtils {
         debugReturn(depth, result);
         return result;
     }
-    
+
     private static Map<String, Object> rToPigMap(RList object, Schema schema, int depth) {
         debugConvertRToPig(depth, "Map", object, schema);
         Map<String, Object> map = new HashMap<String, Object>();
         List<String> names = object.getNames();
-        for(int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < names.size(); i++) {
             Object data = object.get(i);
-            if(data != null) {
+            if (data != null) {
                 map.put(names.get(i), data);
             }
         }
         debugReturn(depth, map);
         return map;
     }
-    
+
     /* Debug Logging Functions adapted from org.apache.pig.scripting.js.JsFunction */
     private static void debugConvertPigToR(int depth, String pigType, Object value, Schema schema) {
         logger.debug(indent(depth) + "converting from Pig " + pigType + " " + value + " using " + stringify(schema));
     }
-    
+
     private static void debugConvertRToPig(int depth, String pigType, RType rValue, Schema schema) {
         logger.debug(indent(depth) + "converting to Pig " + pigType + " " + rValue.toRString() + " using " + stringify(schema));
     }
-    
+
     private static void debugReturn(int depth, Object value) {
-        String valStr = (value instanceof RType) ? ((RType)value).toRString() : value.toString();
+        String valStr = (value instanceof RType) ? ((RType) value).toRString() : value.toString();
         logger.debug(indent(depth) + "returning " + valStr);
     }
-    
+
     /* Debug Utility Functions taken from org.apache.pig.scripting.js.JsFunction */
     public static String indent(int depth) {
         StringBuilder b = new StringBuilder(depth * 2);
-        for(int i = 0; i < depth*2; i++) {
+        for (int i = 0; i < depth * 2; i++) {
             b.append(' ');
         }
         return b.toString();
     }
-    
+
     public static String stringify(Schema schema) {
         StringBuilder builder = new StringBuilder();
         stringify(schema, builder);
         return builder.toString();
     }
-    
+
     private static void stringify(Schema schema, StringBuilder builder) {
-        if(schema != null) {
+        if (schema != null) {
             builder.append("( ");
             List<FieldSchema> fields = schema.getFields();
-            for(int i = 0; i < fields.size(); i++) {
+            for (int i = 0; i < fields.size(); i++) {
                 FieldSchema fs = fields.get(i);
-                if(i != 0) {
+                if (i != 0) {
                     builder.append(", ");
                 }
                 builder

@@ -1,6 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 Connor Woodson
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.cwoodson.pigaddons.rpig;
 
@@ -26,22 +45,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author connor-woodson
  */
-public class RScriptEngine extends ScriptEngine
-{
+public class RScriptEngine extends ScriptEngine {
+
     private static final Logger log = LoggerFactory.getLogger(RScriptEngine.class);
-    
-    private static class Interpreter
-    {
+
+    private static class Interpreter {
+
         static final RConnector rEngine;
         static final Set<String> internalNames = new HashSet<String>();
         static final Set<String> registeredFuncs = new HashSet<String>();
-        static
-        {
+
+        static {
             Runtime.getRuntime().addShutdownHook(new RShutdown());
             try {
                 rEngine = RJriConnector.create();
-                if(rEngine == null)
-                {
+                if (rEngine == null) {
                     log.error("Rengine failed to be created. Exiting program.");
                     System.exit(1);
                 }
@@ -49,68 +67,67 @@ public class RScriptEngine extends ScriptEngine
                 rEngine.voidEval("library('rJava')");
                 rEngine.voidEval(".jinit()");
                 rEngine.voidEval(".jaddClassPath('" + getJarPath(Utils.class) + "')");
-                
+
                 // set up helpful functions
                 rEngine.voidEval("Utils.logInfo <<- function(info) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='V', method='LogInfo', info) }");
                 rEngine.voidEval("Utils.logError <<- function(error) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='v', method='LogError', error) }");
                 rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
-                
+
                 internalNames.add("Utils.logError");
                 internalNames.add("Utils.installPackage");
-                
+
                 // set up JavaGD
                 //rEngine.voidEval("Sys.setenv('JAVAGD_USE_RJAVA'=TRUE)");
                 //rEngine.voidEval("Sys.setenv('JAVAGD_CLASS_NAME'='com.cwoodson.pigaddons.rfunctions.RGraphics')");
                 //rEngine.voidEval("Utils.installPackage('JavaGD')");
                 //rEngine.voidEval("library('JavaGD')");
-                
+
                 String width_str = System.getProperty("rpig.gfx.width");
                 Integer width;
                 try {
                     width = width_str == null ? 640 : Integer.parseInt(width_str);
-                } catch(NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     width = 640;
                 }
-                
+
                 String height_str = System.getProperty("rpig.gfx.height");
                 Integer height;
                 try {
                     height = height_str == null ? 480 : Integer.parseInt(height_str);
-                } catch(NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     height = 480;
                 }
-                
+
                 String ps_str = System.getProperty("rpig.gfx.ps");
                 Integer ps;
                 try {
                     ps = ps_str == null ? 12 : Integer.parseInt(ps_str);
-                } catch(NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     ps = 12;
                 }
                 //rEngine.voidEval("JavaGD('rPig GFX', width=" + width.toString()
                 //        + ", height=" + height.toString() + ", ps=" + ps.toString() + ")");
-                        
+
                 // set up graphics functions
-                  // save - can save internally by adding to a map<String, Image>
-                  // save to file
-                  // flume?
-                  // email?
-                
+                // save - can save internally by adding to a map<String, Image>
+                // save to file
+                // flume?
+                // email?
+
                 // set up Pig functions
-                  // compile/bind
-            } catch(RException re) {
+                // compile/bind
+            } catch (RException re) {
                 log.error("RException thrown", re);
                 throw new RuntimeException("Unable to initialize R", re);
-            } catch(FileNotFoundException fnfe) {
+            } catch (FileNotFoundException fnfe) {
                 log.error("FileNotFoundException thrown", fnfe);
                 throw new RuntimeException("Unable to initialize RScriptEngine", fnfe);
             }
         }
-        
-        static void init(String path, PigContext pigContext) throws IOException
-        {
+
+        static void init(String path, PigContext pigContext) throws IOException {
             // rengine execute its stuff
-            
+
             InputStream is = getScriptAsStream(path);
             try {
                 execFile(is, path, pigContext);
@@ -118,26 +135,23 @@ public class RScriptEngine extends ScriptEngine
                 is.close();
             }
         }
-        
-        static void execFile(InputStream script, String path, PigContext pigContext) throws ExecException
-        {
+
+        static void execFile(InputStream script, String path, PigContext pigContext) throws ExecException {
             try {
                 rEngine.execFile(script, path);
-            } catch(RException re) {
+            } catch (RException re) {
                 throw new ExecException(re);
             }
         }
     }
-    
+
     @Override
     public void registerFunctions(String path, String namespace, PigContext context) throws IOException {
         Interpreter.init(path, context);
         namespace = (namespace == null) ? "" : namespace + NAMESPACE_SEPARATOR;
-        for(String name : Interpreter.rEngine.lsFunctions())
-        {
-            if(!Interpreter.internalNames.contains(name))
-            {
-                if(Interpreter.registeredFuncs.contains(name)) {
+        for (String name : Interpreter.rEngine.lsFunctions()) {
+            if (!Interpreter.internalNames.contains(name)) {
+                if (Interpreter.registeredFuncs.contains(name)) {
                     log.warn("R Function " + name + " has already been registered");
                     continue;
                 }
@@ -153,27 +167,24 @@ public class RScriptEngine extends ScriptEngine
     @Override
     protected Map<String, List<PigStats>> main(PigContext pigContext, String scriptFile) throws IOException {
         PigServer pigServer = new PigServer(pigContext, false);
-        
+
         String thisJarPath = getJarPath(RScriptEngine.class);
-        if(thisJarPath != null)
-        {
+        if (thisJarPath != null) {
             pigServer.registerJar(thisJarPath);
         }
-        
+
         File f = new File(scriptFile);
-        
-        if(!f.canRead())
-        {
+
+        if (!f.canRead()) {
             log.error("Unable to open specified file");
             throw new IOException("Can't read file: " + scriptFile);
         }
-        
+
         try {
             Interpreter.init(scriptFile, pigServer.getPigContext());
         } finally {
-            
         }
-        
+
         return getPigStatsMap();
     }
 
@@ -185,16 +196,14 @@ public class RScriptEngine extends ScriptEngine
     @Override
     protected Map<String, Object> getParamsFromVariables() throws IOException {
         RConnector rEngine = Interpreter.rEngine;
-        
+
         Map<String, Object> result = new HashMap<String, Object>();
         List<String> variables = rEngine.lsVariables();
-        for(String v : variables)
-        {
-            if(!Interpreter.internalNames.contains(v))
-            {
+        for (String v : variables) {
+            if (!Interpreter.internalNames.contains(v)) {
                 try {
                     result.put(v, rEngine.eval(v));
-                } catch(RException re) {
+                } catch (RException re) {
                     log.error("Error evaluating variable " + v, re);
                     throw new IOException("Error evaluating variable " + v, re);
                 }
@@ -202,24 +211,20 @@ public class RScriptEngine extends ScriptEngine
         }
         return result;
     }
-    
-    public static RConnector getEngine()
-    {
+
+    public static RConnector getEngine() {
         return Interpreter.rEngine;
     }
-    
-    private static class RShutdown extends Thread
-    {
+
+    private static class RShutdown extends Thread {
+
         @Override
-        public void run()
-        {
+        public void run() {
             try {
-                if(Interpreter.rEngine != null)
-                {
+                if (Interpreter.rEngine != null) {
                     Interpreter.rEngine.terminate();
                 }
-            } catch(Exception e) {
-                
+            } catch (Exception e) {
             }
         }
     }

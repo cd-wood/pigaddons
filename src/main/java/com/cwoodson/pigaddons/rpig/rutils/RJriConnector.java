@@ -1,6 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 Connor Woodson
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.cwoodson.pigaddons.rpig.rutils;
 
@@ -25,30 +44,27 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * Based off of the source code from org.nuiton.j2r.jni.RJniEngine
- * 
+ *
  * @author connor-woodson
  */
-public class RJriConnector implements RConnector
-{
+public class RJriConnector implements RConnector {
+
     private static final Logger log = LoggerFactory.getLogger(RJriConnector.class);
- 
     /**
      * Rengine is made to be static
      */
     protected static Rengine engine;
-    
+
     @Override
-    public boolean init()
-    {
-        if(engine == null)
-        {
+    public boolean init() {
+        if (engine == null) {
             try {
                 System.loadLibrary("jri");
                 log.info("JRI successfully loaded");
-            } catch(Throwable t) {
+            } catch (Throwable t) {
                 log.error("Unable to load JRI. Exception follows.", t);
             }
-            
+
             try {
                 String[] args = {"--no-save", "--vanilla"};
 
@@ -60,16 +76,16 @@ public class RJriConnector implements RConnector
                 }
 
                 engine = new Rengine(args, false, null);
-                
+
                 if (!engine.waitForR()) {
                     log.error("Cannot load the R engine");
                     return false;
                 }
-                
+
                 log.info("Rengine Started");
             } catch (Throwable eee) {
                 log.error("An error occured during R/JNI initialization.",
-                    eee);
+                        eee);
                 return false;
             }
         }
@@ -105,7 +121,7 @@ public class RJriConnector implements RConnector
                 for (int i = 0; i < array.length; i++) {
                     bigArray[i] = (Integer) array[i];
                 }
-                
+
                 //Check if only one integer, return an integer.
                 if (array.length == 1) {
                     result = new RPrimitive((Integer) bigArray[0]);
@@ -120,7 +136,7 @@ public class RJriConnector implements RConnector
                 for (int i = 0; i < doublearray.length; i++) {
                     bigdoublearray[i] = (Double) doublearray[i];
                 }
-                
+
                 //Check if only one double, return a double.
                 if (doublearray.length == 1) {
                     result = new RPrimitive(bigdoublearray[0]);
@@ -168,7 +184,7 @@ public class RJriConnector implements RConnector
                 break;
             case REXP.XT_VECTOR:
                 //dataframes, lists and vectors are recognized as vectors.
-                
+
                 //get REXP asList to successfully detect lists.
                 if (RHelpers.isDataframe(rexp)) {
                     convertDataFrame(rexp);
@@ -180,8 +196,8 @@ public class RJriConnector implements RConnector
                 break;
             default:
                 //if don't know the type, throw an exception.
-                log.error("Unknown return type [" + type + "] " + "on : " +
-                    rexp.toString());
+                log.error("Unknown return type [" + type + "] " + "on : "
+                        + rexp.toString());
                 break;
         }
         return result;
@@ -189,7 +205,7 @@ public class RJriConnector implements RConnector
 
     /**
      * Terminate the R connection.
-     * 
+     *
      * @see org.nuiton.j2r.REngine#terminate()
      */
     @Override
@@ -205,9 +221,9 @@ public class RJriConnector implements RConnector
      * commit() method is called.
      *
      * @param expr the R expression to evaluate.
-     * 
+     *
      * @see org.nuiton.j2r.REngine#voidEval(java.lang.String)
-     * @see org.nuiton.j2r.jni.RJniEngine#commit() 
+     * @see org.nuiton.j2r.jni.RJniEngine#commit()
      */
     @Override
     public void voidEval(String expr) throws RException {
@@ -223,10 +239,9 @@ public class RJriConnector implements RConnector
             throw new RException(r.asString());
         }
     }
-    
+
     @Override
-    public RType eval(String expr) throws RException
-    {
+    public RType eval(String expr) throws RException {
         String call = RHelpers.safeCall(expr);
         log.info(call);
         REXP r = engine.eval(call);
@@ -235,28 +250,28 @@ public class RJriConnector implements RConnector
         }
         return convertResult(r);
     }
-    
+
     private RDataFrame convertDataFrame(REXP rexp) throws RException {
         throw new RException("Data Frames are not currently supported");
     }
-    
+
     private RList convertList(REXP rexp) throws RException {
         org.rosuda.JRI.RList list = rexp.asList();
-        
+
         List<Object> data = new ArrayList<Object>();
         String[] names = {};
-        
+
         REXP attrNames = RHelpers.getNamesAttribute(rexp);
-        if(attrNames != null) {
+        if (attrNames != null) {
             names = attrNames.asStringArray();
         }
-        
+
         Boolean flag = true;
         int index = 0;
-        
-        while(flag) {
+
+        while (flag) {
             REXP tempREXP = list.at(index);
-            if(tempREXP == null) {
+            if (tempREXP == null) {
                 flag = false;
             } else {
                 Object converted = convertResult(tempREXP);
@@ -264,62 +279,58 @@ public class RJriConnector implements RConnector
                 index++;
             }
         }
-        
+
         return new RList(names, data);
     }
-    
-    private RList convertVector(RVector vec) throws RException
-    {
+
+    private RList convertVector(RVector vec) throws RException {
         List<Object> data = new ArrayList<Object>();
-        for(Object o : vec) {
-            data.add(convertResult((REXP)o));
+        for (Object o : vec) {
+            data.add(convertResult((REXP) o));
         }
         List<String> names = new ArrayList<String>(0);
-        if(!vec.getNames().isEmpty()) {
+        if (!vec.getNames().isEmpty()) {
             names = vec.getNames();
         }
         return new RList(names, data);
     }
 
     @Override
-    public void execFile(InputStream scriptStream, String path) throws RException
-    {
+    public void execFile(InputStream scriptStream, String path) throws RException {
         BufferedReader in = new BufferedReader(new InputStreamReader(scriptStream));
         log.info("Executing R File: " + path);
         try {
             String line;
             String fullLine = "{\n";
-            while((line = in.readLine()) != null)
-            {
+            while ((line = in.readLine()) != null) {
                 fullLine += line + '\n';
             }
             fullLine += "}";
             voidEval(fullLine);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             log.error("Error while reading input stream", ioe);
             throw new RException("Error while reading input stream", ioe);
-        } catch(RException re) {
+        } catch (RException re) {
             log.error("Error in script passed to execfile", re);
             throw re;
         } finally {
             try {
                 in.close();
-            } catch(IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
-    
+
     @Override
-    public List<String> ls() throws RException
-    {
+    public List<String> ls() throws RException {
         List<String> ls = new ArrayList<String>();
-        List<Object> lsO =  eval("ls()").asList();
-        if(lsO == null) {
+        List<Object> lsO = eval("ls()").asList();
+        if (lsO == null) {
             log.warn("ls() returned NULL");
-        }
-        else {
-            for(Object o : lsO) {
-                if(o instanceof String) {
-                    ls.add((String)o);
+        } else {
+            for (Object o : lsO) {
+                if (o instanceof String) {
+                    ls.add((String) o);
                 } else {
                     log.warn("ls element '" + lsO.toString() + "' not of type String");
                 }
@@ -327,67 +338,55 @@ public class RJriConnector implements RConnector
         }
         return ls;
     }
-    
+
     @Override
-    public List<String> lsVariables()
-    {
+    public List<String> lsVariables() {
         List<String> result = new ArrayList<String>();
         try {
-            for(String s : ls())
-            {
+            for (String s : ls()) {
                 RType clazzRT = eval("class(" + s + ")");
                 Object clazzO;
-                if(clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive)clazzRT).getValue()) instanceof String)
-                {
+                if (clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive) clazzRT).getValue()) instanceof String) {
                     String clazz = (String) clazzO;
-                    if(!"function".equals(clazz))
-                    {
+                    if (!"function".equals(clazz)) {
                         result.add(s);
                     }
-                } else
-                {
+                } else {
                     log.warn("Object returns class that is not a String: " + s);
                 }
             }
-        } catch(RException re) {
+        } catch (RException re) {
             log.error("Error in lsVariables", re);
         }
         return result;
     }
-    
+
     @Override
-    public List<String> lsFunctions()
-    {
+    public List<String> lsFunctions() {
         List<String> result = new ArrayList<String>();
         try {
-            for(String s : ls())
-            {
+            for (String s : ls()) {
                 RType clazzRT = eval("class(" + s + ")");
                 Object clazzO;
-                if(clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive)clazzRT).getValue()) instanceof String)
-                {
+                if (clazzRT instanceof RPrimitive && (clazzO = ((RPrimitive) clazzRT).getValue()) instanceof String) {
                     String clazz = (String) clazzO;
                     log.info("Class of '" + s + "' is '" + clazz + "'");
-                    if("function".equals(clazz))
-                    {
+                    if ("function".equals(clazz)) {
                         result.add(s);
                     }
-                } else
-                {
+                } else {
                     log.warn("Object returns class that is not a String: " + s);
                 }
             }
-        } catch(RException re) {
+        } catch (RException re) {
             log.error("Error in lsFunctions", re);
         }
         return result;
     }
-    
-    public static RJriConnector create()
-    {
+
+    public static RJriConnector create() {
         RJriConnector rjc = new RJriConnector();
-        if(rjc.init())
-        {
+        if (rjc.init()) {
             return rjc;
         } else {
             return null;
