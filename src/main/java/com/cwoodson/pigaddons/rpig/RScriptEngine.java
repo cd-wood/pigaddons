@@ -51,8 +51,8 @@ public class RScriptEngine extends ScriptEngine
                 rEngine.voidEval(".jaddClassPath('" + getJarPath(Utils.class) + "')");
                 
                 // set up helpful functions
-                rEngine.voidEval("Utils.logInfo <<- function(info) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', 'LogInfo', info) }");
-                rEngine.voidEval("Utils.logError <<- function(error) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', 'LogError', error) }");
+                rEngine.voidEval("Utils.logInfo <<- function(info) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='V', method='LogInfo', info) }");
+                rEngine.voidEval("Utils.logError <<- function(error) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='v', method='LogError', error) }");
                 rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
                 
                 internalNames.add("Utils.logError");
