@@ -1,6 +1,6 @@
 REGISTER 'naive-bayes.r' using com.cwoodson.pigaddons.rpig.RScriptEngine as rfuncs;
 
-test_data = LOAD 'naive-bayes.data.test' AS (test_result:int, a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int, i:int, j:int, k:int, l:int, m:int, n:int, o:int, p:int);
+test_data = LOAD 'naive-bayes.data.training' AS (test_result:int, a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int, i:int, j:int, k:int, l:int, m:int, n:int, o:int, p:int);
 
 test_spam = FILTER test_data BY test_result == 1;
 test_spam1 = GROUP test_spam ALL;
