@@ -91,7 +91,7 @@ public class RFunction extends EvalFunc<Object> {
         }
         
         Tuple evalTuple = RUtils.rToPigTuple(result_list, out, 0);
-        Object eval = out.size() == 1 ? evalTuple.get(0) : evalTuple;
+        Object eval = outputSchema.size() == 1 ? evalTuple.get(0) : evalTuple; // Not sure about this
         return eval;
     }
 

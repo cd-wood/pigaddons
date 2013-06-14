@@ -33,23 +33,26 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
         return(list(c(1 + notspam_test_data[[n]], 1 + num_notspam - notspam_test_data[[n]]), c(1 + num_spam - spam_test_data[[n]], 1 + spam_test_data[[n]])))
     }
     
-    tables <- lapply(1:list_length, CalcProb.make_tables);
+    tables <- lapply(1:list_length, CalcProb.make_tables)
+
+    Utils.logInfo(paste('tables: ', toString(tables)))
 
     CalcProb.make_probs <- function(n) {
         return(lapply(1:2, function(x) lapply(1:2, function(y) tables[[n]][[x]][[y]] / (tot + 4))))
     }
     
-    probs <- lapply(1:list_length, CalcProb.make_probs);
+    probs <- lapply(1:list_length, CalcProb.make_probs)
+
+    Utils.logInfo(paste('probs: ', toString(probs)))
 
     result <- list(0, 0.0, 0.0)
 
-    CalcProb.inner <- function(n) {
-        col <- fields[[n]] + 1
-        result[[2]] <- result[[2]] + log(probs[[n]][[1]][[col]])
-        result[[3]] <- result[[3]] + log(probs[[n]][[2]][[col]])
+    CalcProb.inner <- function(var) {
+        result[[2]] <<- result[[2]] + log(probs[[n]][[1]][[var + 1]])
+        result[[3]] <<- result[[3]] + log(probs[[n]][[2]][[var + 1]])
     }
 
-    lapply(1:list_length, CalcProb.inner)
+    lapply(fields, CalcProb.inner)
     
     result[[2]] <- result[[2]] - (log((num_notspam + 1) / tot) * (list_length - 1))
     result[[3]] <- result[[3]] - (log((num_spam + 1) / tot) * (list_length - 1))
