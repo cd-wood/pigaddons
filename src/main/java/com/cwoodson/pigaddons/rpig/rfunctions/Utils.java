@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Utils {
     private static Logger log = LoggerFactory.getLogger(Utils.class);
-    private Utils() {}
+    public Utils() {}
     
     public void LogInfo(String info) {
         log.info(info);
