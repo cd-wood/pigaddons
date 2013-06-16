@@ -1,12 +1,12 @@
 This software package includes the following third-party libraries in its
 packaged Jar file:
 
-JRI: http://www.rforge.net/JRI/
+JRI (rJava): http://www.rforge.net/JRI/ (http://www.rforge.net/rJava/)
 Copyright (C) 2004-2007 Simon Urbanek <simon.urbanek@r-project.org>
 Released under the GNU Lesser General Public License
 as published by the Free Software Foundation; version 2.1 of the License.
 
-REngine:
+REngine: http://svn.rforge.net/org/trunk/rosuda/REngine/
 Copyright (C) 2004,5,6,7  Simon Urbanek
 Released under the GNU Lesser General Public License
 as published by the Free Software Foundation; either version 2.1 of the

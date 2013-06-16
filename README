@@ -15,7 +15,7 @@ This is a repository containing UDFs and Addons for Apache Pig.
 It was created by Connor Woodson <http://www.connorwoodson.com> for the purpose
 of coding, and is released freely to the community under the MIT License
 (see LICENSE).
-The code contained herein is not perfect and might contain bugs (rather,
+The code contained herein is not perfect and might contain bugs (also known as
 hidden/incomplete features). If you have any comments, suggestions, or bug
 reports, please forward them to <cwoodson.dev@gmail.com> for consideration.
 
