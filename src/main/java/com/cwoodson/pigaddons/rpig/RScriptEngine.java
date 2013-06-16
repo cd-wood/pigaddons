@@ -71,49 +71,50 @@ public class RScriptEngine extends ScriptEngine {
                 // set up helpful functions
                 rEngine.voidEval("Utils.logInfo <<- function(info) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='V', method='LogInfo', info) }");
                 rEngine.voidEval("Utils.logError <<- function(error) { .jcall('com/cwoodson/pigaddons/rpig/rfunctions/Utils', returnSig='v', method='LogError', error) }");
-                rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org') }; return(TRUE) }");
+                rEngine.voidEval("Utils.installPackage <<- function(name) { if(!is.character(name)) { Utils.logError('Utils.installPackage not called on a string'); return(FALSE) }; if(name %in% rownames(installed.packages()) == FALSE) { install.packages(name, dependencies=TRUE, repos='http://cran.us.r-project.org'); library(name) }; return(TRUE) }");
 
+                internalNames.add("Utils.logInfo");
                 internalNames.add("Utils.logError");
                 internalNames.add("Utils.installPackage");
 
                 // set up JavaGD
-                //rEngine.voidEval("Sys.setenv('JAVAGD_USE_RJAVA'=TRUE)");
-                //rEngine.voidEval("Sys.setenv('JAVAGD_CLASS_NAME'='com.cwoodson.pigaddons.rfunctions.RGraphics')");
-                //rEngine.voidEval("Utils.installPackage('JavaGD')");
-                //rEngine.voidEval("library('JavaGD')");
+                if(System.getProperty("rpig.gfx.useJavaGD") != null) {
+                    //rEngine.voidEval("Sys.setenv('JAVAGD_USE_RJAVA'=TRUE)");
+                    //rEngine.voidEval("Sys.setenv('JAVAGD_CLASS_NAME'='com.cwoodson.pigaddons.rfunctions.RGraphics')");
+                    //rEngine.voidEval("Utils.installPackage('JavaGD')");
 
-                String width_str = System.getProperty("rpig.gfx.width");
-                Integer width;
-                try {
-                    width = width_str == null ? 640 : Integer.parseInt(width_str);
-                } catch (NumberFormatException nfe) {
-                    width = 640;
+                    String width_str = System.getProperty("rpig.gfx.width");
+                    Integer width;
+                    try {
+                        width = width_str == null ? 640 : Integer.parseInt(width_str);
+                    } catch (NumberFormatException nfe) {
+                        width = 640;
+                    }
+
+                    String height_str = System.getProperty("rpig.gfx.height");
+                    Integer height;
+                    try {
+                        height = height_str == null ? 480 : Integer.parseInt(height_str);
+                    } catch (NumberFormatException nfe) {
+                        height = 480;
+                    }
+
+                    String ps_str = System.getProperty("rpig.gfx.ps");
+                    Integer ps;
+                    try {
+                        ps = ps_str == null ? 12 : Integer.parseInt(ps_str);
+                    } catch (NumberFormatException nfe) {
+                        ps = 12;
+                    }
+                    //rEngine.voidEval("JavaGD('rPig GFX', width=" + width.toString()
+                    //        + ", height=" + height.toString() + ", ps=" + ps.toString() + ")");
+
+                    // set up graphics functions
+                    // save - can save internally by adding to a map<String, Image>
+                    // save to file
+                    // flume?
+                    // email?
                 }
-
-                String height_str = System.getProperty("rpig.gfx.height");
-                Integer height;
-                try {
-                    height = height_str == null ? 480 : Integer.parseInt(height_str);
-                } catch (NumberFormatException nfe) {
-                    height = 480;
-                }
-
-                String ps_str = System.getProperty("rpig.gfx.ps");
-                Integer ps;
-                try {
-                    ps = ps_str == null ? 12 : Integer.parseInt(ps_str);
-                } catch (NumberFormatException nfe) {
-                    ps = 12;
-                }
-                //rEngine.voidEval("JavaGD('rPig GFX', width=" + width.toString()
-                //        + ", height=" + height.toString() + ", ps=" + ps.toString() + ")");
-
-                // set up graphics functions
-                // save - can save internally by adding to a map<String, Image>
-                // save to file
-                // flume?
-                // email?
-
                 // set up Pig functions
                 // compile/bind
             } catch (RException re) {

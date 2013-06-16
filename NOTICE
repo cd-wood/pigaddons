@@ -1,0 +1,21 @@
+This software package includes the following third-party libraries in its
+packaged Jar file:
+
+JRI: http://www.rforge.net/JRI/
+Copyright (C) 2004-2007 Simon Urbanek <simon.urbanek@r-project.org>
+Released under the GNU Lesser General Public License
+as published by the Free Software Foundation; version 2.1 of the License.
+
+REngine:
+Copyright (C) 2004,5,6,7  Simon Urbanek
+Released under the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1 of the
+License, or (at your option) any later version.
+
+Rserve: http://www.rforge.net/Rserve/
+Created by Simon Urbanek
+Licensed under GPL
+
+JavaGD: http://www.rforge.net/JavaGD/
+Created by Simon Urbanek
+Licensed under GPL 2/3

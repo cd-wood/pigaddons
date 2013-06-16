@@ -53,7 +53,7 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     num_notspam <- notspam_test_data[[list_length + 1]]
     tot <- num_spam + num_notspam
 
-    # Makes a Naive Bayes table representing the following:
+    # Makes a Naive Bayes table for each field representing the following:
     #
     #  |  0  |  1  |
     # -|-----|-----|
@@ -76,8 +76,10 @@ CalcProb <<- function(fields, spam_test_data, notspam_test_data) {
     
     tables <- lapply(1:list_length, CalcProb.make_tables)
 
-    # Simple probability, divide each cell by total number of events
+    # Calculate the probability, divide each cell by total number of events
     # +4 is because of LaPlace
+    # It is possible to combine the two operations into one function, but that
+    # simplification has been left out to show the separate steps
     CalcProb.make_probs <- function(n) {
         return(lapply(1:2, function(x) lapply(1:2, function(y) tables[[n]][[x]][[y]] / (tot + 4))))
     }

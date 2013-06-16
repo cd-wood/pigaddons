@@ -1,6 +1,113 @@
 pigaddons
 =========
 
-Collection of addons for Apache Pig
+Contents:
 
-RScriptEngine: This will allow you to write R UDFs. Please see the appropriate documentation for how to do that.
+1. About
+2. Contained Packages
+3. Examples
+
+---------
+1. About
+---------
+
+This is a repository containing UDFs and Addons for Apache Pig.
+It was created by Connor Woodson <http://www.connorwoodson.com> for the purpose
+of coding, and is released freely to the community under the MIT License
+(see LICENSE).
+The code contained herein is not perfect and might contain bugs (rather,
+hidden/incomplete features). If you have any comments, suggestions, or bug
+reports, please forward them to <cwoodson.dev@gmail.com> for consideration.
+
+----------------------
+2. Contained Packages
+----------------------
+_________________
+A. RScriptEngine <http://theconnorcode.blogspot.com/2013/06/rpig-overview.html>
+-----------------
+
+RScriptEngine is a scripting engine for Apache Pig that interprets the R
+language <http://www.r-project.org/>. The goal behind this scripting engine
+is compatability and ease of use in Amazon EMR jobs. Included /scripts is
+the rpig-bootstrap.sh script, that is meant as a bootstrap script for Amazon EMR
+instances; it can also be used on personal instances to set up an environment
+compatible with the scripting engine.
+This interpreter makes use of JRI <http://www.rforge.net/JRI/> to an instance of
+R to run inside of the Java process. It is a future goal to also support
+Rserve, which is another method of interacting with R from inside of Java.
+
+Required REGISTER statements:
+-----------------------------
+
+REGISTER '/path/to/pigaddons-0.1-SNAPSHOT.jar';
+REGISTER '/path/to/script.r' USING com.cwoodson.pigaddons.rpig.RScriptEngine
+                                                                   AS namespace;
+
+Pre-Defined R Functions:
+------------------------
+
+Utils.installPackage(name) : wrapper to install and load the specified R package
+Utils.logInfo(info)        : logs the given string as an info-level message
+Utils.logError(error)      : logs the given string as an error-level message
+
+System Environment Variables:
+-----------------------------
+(NOTE: these will do nothing until a future release)
+
+Define these by adding "-D<name>=<value>" to the Pig command call
+
+rpig.gfx.useJavaGD         : when defined will set up the JavaGD package to
+                             connect with built-in functionality
+rpig.gfx.width             : when using the above, specifies the graphics width
+rpig.gfx.height            : when using the above, specifies the graphics height
+rpig.gfx.ps                : when using the above, specifies the gfx point size
+
+________________
+B. FlumeStorage <>
+----------------
+
+In Progress
+
+------------
+3. Examples
+------------
+
+______________
+A. NaiveBayes
+--------------
+
+Naive Bayes is a classification-based machine learning algorithm. The provided
+example produces an implementation for classifying data where each field is a
+1 or a 0 (yes/no, true/false, spam/not spam). By using a set of training data
+where the correct classification is known, a series of tables can be constructed
+(look at the R script for an explanation of the tables). These tables are then
+used for the data that gets tested. The probabilities that an event should be
+classified as 0 and as a 1 are both calculated, and the whichever classification
+produces the larger number is considered the correct classification. We
+implement a form of Naive Bayes known as LaPlace where we start with 1 in each
+cell of the tables; this helps solve issues where in the training data set
+a certain combination of correct classification / field value is never
+encountered. Having a 1 in this cell instead of a 0 prevents saying that the
+certain combination is impossible, but rather that we haven't seen that
+combination. To simplify the creation of the probabilities, we also take the
+Log of everything (so we are adding instead of multiplying); one result of this
+is that we don't end up with a number between 0 and 1 but rather a negative
+number such that e^number is the probability (I think).
+This example uses a randomly generated data set of 16 fields. For the training
+data, the first field is whether the event is classified as a 0 or 1, and the
+16 fields follow that. Some notes about this example. The Pig script is
+dependent on the structure of the data / the number of fields, as we must
+declare a schema when we load the data sets that recognizes each field. We split
+the training data into two sets based off whether it is classified as 0 or 1
+(not spam versus spam), and for both of these we sum up each field. This results
+in a count for spam/not spam for the number of times each field was a 0/1 in the
+training data (we also include the total number of records in each group). These
+numbers are turned in to the table used by Naive Bayes in the R script.
+The R script itself is self-contained and generalized to work on any input
+with the assumption of 0/1 as the only possible field values. The script starts
+with error checking on the input parameters to make sure that it is called
+correctly from Pig, and then it moves in to the algorithmic part. It returns
+a simple Tuple that contains the classification as well as the calculated log of
+the probabilities for each possible classification; the later two numbers are
+not really important, and so it could be made simpler by just returning a single
+value.
