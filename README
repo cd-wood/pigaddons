@@ -28,10 +28,10 @@ A. RScriptEngine <http://theconnorcode.blogspot.com/2013/06/rpig-overview.html>
 
 RScriptEngine is a scripting engine for Apache Pig that interprets the R
 language <http://www.r-project.org/>. The goal behind this scripting engine
-is compatability and ease of use in Amazon EMR jobs. Included /scripts is
-the rpig-bootstrap.sh script, that is meant as a bootstrap script for Amazon EMR
-instances; it can also be used on personal instances to set up an environment
-compatible with the scripting engine.
+is compatability and ease use of the R language in Amazon EMR jobs. Included in
+/scripts is the rpig-bootstrap.sh script, that is meant as a bootstrap script
+for Amazon EMR instances; it can also be used on personal instances to set up an
+environment compatible with the scripting engine.
 This interpreter makes use of JRI <http://www.rforge.net/JRI/> to an instance of
 R to run inside of the Java process. It is a future goal to also support
 Rserve, which is another method of interacting with R from inside of Java.
