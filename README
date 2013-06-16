@@ -4,8 +4,9 @@ pigaddons
 Contents:
 
 1. About
-2. Contained Packages
-3. Examples
+2. Compiling
+3. Contained Packages
+4. Examples
 
 ---------
 1. About
@@ -19,8 +20,17 @@ The code contained herein is not perfect and might contain bugs (also known as
 hidden/incomplete features). If you have any comments, suggestions, or bug
 reports, please forward them to <cwoodson.dev@gmail.com> for consideration.
 
+-------------
+2. Compiling
+-------------
+
+This repository uses Maven as its dependency / build manager. To compile it, run
+  mvn clean package
+from the command line, and the resulting JAR will be located in the targets/
+directory.
+
 ----------------------
-2. Contained Packages
+3. Contained Packages
 ----------------------
 _________________
 A. RScriptEngine <http://theconnorcode.blogspot.com/2013/06/rpig-overview.html>
@@ -69,7 +79,7 @@ B. FlumeStorage <>
 In Progress
 
 ------------
-3. Examples
+4. Examples
 ------------
 
 ______________
