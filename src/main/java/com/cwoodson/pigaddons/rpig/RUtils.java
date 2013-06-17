@@ -21,12 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cwoodson.pigaddons.rpig.rutils;
+package com.cwoodson.pigaddons.rpig;
 
 import com.cwoodson.pigaddons.rpig.rtypes.RList;
 import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
 import com.cwoodson.pigaddons.rpig.rtypes.RPrimitiveArray;
 import com.cwoodson.pigaddons.rpig.rtypes.RType;
+import com.cwoodson.pigaddons.rpig.rutils.RException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

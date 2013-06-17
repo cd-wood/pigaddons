@@ -29,7 +29,6 @@ import com.cwoodson.pigaddons.rpig.rtypes.RPrimitive;
 import com.cwoodson.pigaddons.rpig.rtypes.RType;
 import com.cwoodson.pigaddons.rpig.rutils.RConnector;
 import com.cwoodson.pigaddons.rpig.rutils.RException;
-import com.cwoodson.pigaddons.rpig.rutils.RUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
